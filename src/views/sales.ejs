@@ -1,0 +1,62 @@
+<div class="page-heading">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <h1>Sales</h1>
+    <div>
+      <a class="button" href="/sales/add">Add New Sale</a>
+      <a class="button secondary" href="/sales/debtors">View Debtors</a>
+    </div>
+  </div>
+</div>
+
+<section class="mb-4">
+  <div class="card">
+    <strong>Today's Total:</strong> <span class="text-muted">Total Sales Today:</span> <strong><%= typeof totalSales !== 'undefined' ? totalSales : 0 %> UGX</strong>
+  </div>
+</section>
+
+<section>
+  <h2>All Sales</h2>
+  <% if (sales && sales.length) { %>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Amount</th>
+          <th>Room</th>
+          <th>Order Details</th>
+          <th>Status</th>
+          <th>Staff</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% sales.forEach(s => { %>
+          <tr>
+            <td><%= s.id %></td>
+            <td><%= s.amount %></td>
+            <td><%= s.room_number %></td>
+            <td><%= s.order_details %></td>
+            <td>
+              <% const statuses = ['completed','cancelled']; %>
+              <% statuses.forEach(st => { %>
+                <% if (st !== s.status) { %>
+                  <form method="POST" action="/sales/<%= s.id %>/status" class="inline-form" style="margin-right:6px;display:inline-block">
+                    <input type="hidden" name="status" value="<%= st %>">
+                    <button class="button secondary" type="submit"><%= st.charAt(0).toUpperCase() + st.slice(1) %></button>
+                  </form>
+                <% } %>
+              <% }) %>
+              <span style="margin-left:6px;font-weight:bold;"><%= s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : 'Pending' %></span>
+            </td>
+            <td><%= s.staff_name || s.staff_id || 'Unknown' %></td>
+            <td><%= s.created_at %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>No sales recorded.</p>
+  <% } %>
+</section>
+
+<p><a class="button secondary" href="/dashboard">Back to Dashboard</a></p>

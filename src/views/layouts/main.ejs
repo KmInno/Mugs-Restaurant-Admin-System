@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+</head>
+<body class="app-body">
+  <div id="mobile-overlay" class="mobile-overlay" aria-hidden="true"></div>
+  <div id="loading-overlay" class="loading-overlay" aria-hidden="true"><div class="loader"></div></div>
+  <% if (title !== 'Login') { %>
+    <%- include('../partials/header') %>
+  <% } %>
+
+  <div class="app-layout">
+    <% if (title !== 'Login') { %>
+      <aside class="app-sidebar">
+        <%- include('../partials/sidebar') %>
+      </aside>
+    <% } %>
+
+    <main class="app-main">
+      <%- body %>
+    </main>
+  </div>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/app.js"></script>
+</body>
+</html>

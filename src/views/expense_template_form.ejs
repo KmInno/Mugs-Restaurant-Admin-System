@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+</head>
+
+<body>
+    <h1>
+        <%= title %>
+    </h1>
+    <form method="POST" 
+action="<%= template 
+    ? ('/settings/expenses/templates/' + template.id + '/edit') 
+    : '/settings/expenses/templates/add' 
+%>">
+        <div>
+            <label>Name: <input name="name" type="text" value="<%= template ? template.name : '' %>" required></label>
+        </div>
+
+        <div>
+            <button type="submit">
+                <%= template ? 'Update' : 'Create' %>
+            </button>
+            <a href="/settings/expenses/templates">Cancel</a>
+        </div>
+    </form>
+</body>
+
+</html>

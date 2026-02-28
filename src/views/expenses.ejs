@@ -1,0 +1,52 @@
+<div class="page-heading" style="display:flex;justify-content:space-between;align-items:center">
+  <h1>Expenses</h1>
+  <div>
+    <a class="button" href="/expenses/new">Add Expense</a>
+  </div>
+</div>
+
+<section class="mb-4">
+  <div class="card">
+    <strong>Today's Total:</strong> <strong><%= totalExpenses || 0 %> UGX</strong>
+  </div>
+</section>
+
+<section>
+  <h2>All Expenses</h2>
+  <% if (expenses && expenses.length) { %>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% expenses.forEach(e => { %>
+          <tr>
+            <td><%= e.id %></td>
+            <td><%= e.description %></td>
+            <td><%= e.amount %></td>
+            <td>
+              <% if ((e.status || 'credit') === 'credit') { %>
+                <form method="POST" action="/expenses/<%= e.id %>/status" class="inline-form">
+                  <input type="hidden" name="status" value="paid">
+                  <button class="button secondary" type="submit">Mark Paid</button>
+                </form>
+                <span style="margin-left:6px;color:gray;">Credit</span>
+              <% } else { %>
+                <span style="font-weight:bold;color:green;">Paid</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>No expenses recorded.</p>
+  <% } %>
+</section>
+
+<p><a class="button secondary" href="/dashboard">Back to Dashboard</a></p>

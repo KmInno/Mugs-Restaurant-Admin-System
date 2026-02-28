@@ -1,0 +1,61 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title"><i class="fa fa-user icon"></i>Welcome, <%= userName %>!</h1>
+      <p class="text-muted">Quick snapshot of today's activity</p>
+    </div>
+    <div class="dashboard-actions">
+      <a class="button secondary" href="/production"><i class="fa fa-industry" style="margin-right:8px"></i>Record Production</a>
+    </div>
+  </header>
+
+  <section class="stats-grid mb-4">
+    <div class="stat-card">
+      <div class="stat-label"><i class="fa fa-dollar-sign icon-sm"></i>Total Sales</div>
+      <div class="stat-value"><%= totalSales || 0 %> UGX</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><i class="fa fa-user-friends icon-sm"></i>Total Debtors</div>
+      <div class="stat-value"><%= typeof totalDebtors !== 'undefined' ? totalDebtors : 0 %> UGX</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><i class="fa fa-file-invoice-dollar icon-sm"></i>Total Expenses</div>
+      <div class="stat-value"><%= totalExpenses || 0 %> UGX</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><i class="fa fa-chart-line icon-sm"></i>Estimated Profit</div>
+      <div class="stat-value"><%= profit || 0 %> UGX</div>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="card">
+      <h3 class="mb-2"><i class="fa fa-chart-bar icon"></i>Sales Overview</h3>
+      <div class="chart-placeholder">(Chart placeholder) </div>
+      <p class="text-muted mb-0">Daily sales: <strong><%= totalSales || 0 %> UGX</strong></p>
+    </div>
+
+    <div class="card">
+      <h3 class="mb-2"><i class="fa fa-users icon"></i>Staff Performance</h3>
+      <table class="staff-table">
+        <thead>
+          <tr><th>Staff</th><th>Sales</th><th>Share</th></tr>
+        </thead>
+        <tbody>
+          <% staff.forEach(s => { %>
+            <% const pct = (totalSales && totalSales > 0) ? Math.round((s.sales / totalSales) * 100) : 0; %>
+            <tr>
+              <td><%= s.name %></td>
+              <td><%= s.sales %> UGX</td>
+              <td style="width:160px">
+                <div class="progress"><div class="progress-bar" style="width:<%= pct %>%"></div></div>
+                <div class="text-muted" style="font-size:12px;margin-top:6px"><%= pct %>%</div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>

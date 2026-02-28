@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Production - Stock Count</title>
+</head>
+<body>
+  <h1>Production / Daily Counts</h1>
+  <% if (messages && messages.error) { %>
+    <div style="color:red;"><%= messages.error.join(', ') %></div>
+  <% } %>
+  <% if (messages && messages.success) { %>
+    <div style="color:green;"><%= messages.success.join(', ') %></div>
+  <% } %>
+
+  <form method="POST" action="/production">
+    <div>
+      <label>Item: <input name="item" type="text" required></label>
+    </div>
+    <div>
+      <label>Quantity: <input name="quantity" type="number" min="0" required></label>
+    </div>
+    <div>
+      <button type="submit">Add</button>
+    </div>
+  </form>
+
+  <h2>Today's Total Produced: <%= typeof total !== 'undefined' ? total : 0 %></h2>
+
+  <% if (entries && entries.length) { %>
+    <table border="1" cellpadding="6">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% entries.forEach(e => { %>
+          <tr>
+            <td><%= e.id %></td>
+            <td><%= e.item %></td>
+            <td><%= e.quantity %></td>
+            <td><%= e.created_at %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>No entries for today.</p>
+  <% } %>
+
+  <p><a href="/dashboard">Back to Dashboard</a></p>
+</body>
+</html>

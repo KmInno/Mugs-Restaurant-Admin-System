@@ -1,0 +1,31 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Welcome, <%= userName %>!</h1>
+      <p class="text-muted">Employee dashboard — quick sales actions</p>
+    </div>
+    <div class="dashboard-actions">
+      <a class="button" href="/sales/add">Add Sale</a>
+    </div>
+  </header>
+
+  <section class="stats-grid mb-4">
+    <div class="stat-card">
+      <div class="stat-label">Your Today's Sales</div>
+      <div class="stat-value"><%= totalSales || 0 %> UGX</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Quick Actions</div>
+      <div class="mb-2"><a class="button" href="/sales/add">Add Sale</a></div>
+      <div><a class="button secondary" href="/production">Record Production</a></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Contact</div>
+      <div class="text-muted">Contact admin for reports or expenses access</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Help</div>
+      <div class="text-muted">Use sales page to record orders</div>
+    </div>
+  </section>
+</div>

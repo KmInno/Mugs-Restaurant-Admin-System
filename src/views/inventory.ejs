@@ -1,0 +1,47 @@
+<div class="card">
+  <h2>Inventory / Stock</h2>
+  <p><a href="/settings">Back to Settings</a></p>
+
+  <p><a href="/settings/inventory/add" class="button">Add Item</a></p>
+
+  <% if (items && items.length) { %>
+    <table class="card" style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>SKU</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach(item => { %>
+          <tr>
+            <td><%= item.id %></td>
+            <td><%= item.name %></td>
+            <td><%= item.sku || '' %></td>
+            <td><%= item.quantity %></td>
+            <td><%= item.status %></td>
+            <td><%= item.notes || '' %></td>
+            <td>
+              <form method="post" action="/settings/inventory/<%= item.id %>/status" style="display:inline">
+                <% if (item.status === 'instock') { %>
+                  <input type="hidden" name="status" value="outofstock" />
+                  <button class="button" type="submit">Mark Out of Stock</button>
+                <% } else { %>
+                  <input type="hidden" name="status" value="instock" />
+                  <button class="button" type="submit">Mark In Stock</button>
+                <% } %>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>No inventory items yet.</p>
+  <% } %>
+</div>

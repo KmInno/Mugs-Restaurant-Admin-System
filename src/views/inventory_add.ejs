@@ -1,0 +1,21 @@
+<div class="card form-card">
+  <h2>Add Inventory Item</h2>
+  <form method="post" action="/settings/inventory/add">
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" required>
+
+    <label for="sku">SKU</label>
+    <input type="text" name="sku" id="sku">
+
+    <label for="quantity">Quantity</label>
+    <input type="number" name="quantity" id="quantity" value="0">
+
+    <label for="notes">Notes</label>
+    <textarea name="notes" id="notes"></textarea>
+
+    <div class="form-actions">
+      <button type="submit">Add Item</button>
+      <a class="button secondary" href="/settings/inventory">Cancel</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,25 @@
+<div class="form-wrapper">
+    <div class="form-card card form-small">
+        <h2>Add Expense</h2>
+        <form method="POST" action="/expenses/add">
+
+            <label>Description</label>
+            <input type="text" name="description" required>
+
+            <label>Amount</label>
+            <input type="number" step="0.01" name="amount" required>
+
+            <label>Status</label>
+            <select name="status">
+                <option value="credit" selected>Credit</option>
+                <option value="paid">Paid</option>
+            </select>
+
+            <div class="form-actions">
+                <button type="submit">Save Expense</button>
+                <a class="button secondary" href="/expenses">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+<nav class="app-nav">
+  <h3>Menu</h3>
+  <ul>
+    <% if (user) { %>
+      <li><a href="/dashboard"><i class="fa fa-home icon"></i>Dashboard</a></li>
+      <li><a href="/sales"><i class="fa fa-shopping-cart icon"></i>Sales</a></li>
+
+      <% const role = (user.role || '').toString().toLowerCase(); %>
+      <% if (role === 'admin') { %>
+        <li><a href="/expenses"><i class="fa fa-file-invoice-dollar icon"></i>Expenses</a></li>
+        <li><a href="/settings"><i class="fa fa-cog icon"></i>Settings</a></li>
+      <% } else if (role === 'staff') { %>
+        <li><a href="/sales/debtors"><i class="fa fa-user-friends icon"></i>Debtors</a></li>
+        <li><a href="/settings/inventory/add"><i class="fa fa-box-open icon"></i>Add Inventory Item</a></li>
+      <% } else { %>
+        <!-- regular users: minimal links (dashboard, sales shown above) -->
+      <% } %>
+
+      <li><a href="/logout"><i class="fa fa-sign-out-alt icon"></i>Logout</a></li>
+    <% } %>
+
+  </ul>
+</nav>

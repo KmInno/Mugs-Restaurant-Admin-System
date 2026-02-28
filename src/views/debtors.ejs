@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debtors</title>
+</head>
+<body>
+  <h1>Debtors</h1>
+  <p>Total Debtors Today: <%= typeof totalDebtors !== 'undefined' ? totalDebtors : 0 %> UGX</p>
+
+  <% if (debtors && debtors.length) { %>
+    <table border="1" cellpadding="6">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Amount</th>
+          <th>Room</th>
+          <th>Order Details</th>
+          <th>Status</th>
+          <th>Staff</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% debtors.forEach(s => { %>
+          <tr>
+            <td><%= s.id %></td>
+            <td><%= s.amount %></td>
+            <td><%= s.room_number %></td>
+            <td><%= s.order_details %></td>
+            <td><%= s.status %></td>
+            <td><%= s.staff_name || s.staff_id || 'Unknown' %></td>
+            <td><%= s.created_at %></td>
+            <td>
+              <form method="POST" action="/sales/<%= s.id %>/status" style="display:inline;margin-right:6px;">
+                <input type="hidden" name="status" value="completed">
+                <button type="submit">Mark Completed</button>
+              </form>
+              <form method="POST" action="/sales/<%= s.id %>/status" style="display:inline;">
+                <input type="hidden" name="status" value="cancelled">
+                <button type="submit">Cancel</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>No debtors found.</p>
+  <% } %>
+
+  <p><a href="/sales">Back to Sales</a></p>
+</body>
+</html>

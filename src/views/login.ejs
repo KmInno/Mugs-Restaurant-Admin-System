@@ -1,0 +1,22 @@
+<div class="form-wrapper login-center">
+  <div class="form-card card form-small">
+    <h2>Login</h2>
+
+    <% if (messages && messages.error) { %>
+      <div class="alert"><%= messages.error.join(', ') %></div>
+    <% } %>
+
+    <form id="loginForm" method="POST" action="/login">
+      <label>Email</label>
+      <input type="email" name="email" placeholder="you@example.com" required />
+
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Password" required />
+
+      <div class="form-actions">
+        <button type="submit">Login</button>
+        <a class="button secondary" href="/account/signup">Sign up</a>
+      </div>
+    </form>
+  </div>
+</div>

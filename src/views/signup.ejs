@@ -1,0 +1,35 @@
+<div class="form-wrapper">
+  <div class="form-card card form-small">
+    <h2>Create Account</h2>
+
+    <% if (messages && messages.error) { %>
+      <div class="alert"><%= messages.error.join(', ') %></div>
+    <% } %>
+    <% if (messages && messages.success) { %>
+      <div class="alert" style="background:#ecfdf5;border-color:#d1fae5;color:#065f46"><%= messages.success.join(', ') %></div>
+    <% } %>
+
+    <form method="POST" action="/account/signup">
+      <label>Name</label>
+      <input name="name" type="text" value="<%= typeof name !== 'undefined' ? name : '' %>" required>
+
+      <label>Email</label>
+      <input name="email" type="email" value="<%= typeof email !== 'undefined' ? email : '' %>" required>
+
+      <label>Password</label>
+      <input name="password" type="password" required>
+
+      <label>Account Type</label>
+      <select name="role">
+        <option value="recep">User</option>
+        <option value="staff">Staff</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <div class="form-actions">
+        <button type="submit">Create Account</button>
+        <a class="button secondary" href="/account/login">Back to login</a>
+      </div>
+    </form>
+  </div>
+</div>
