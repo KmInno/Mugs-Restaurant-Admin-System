@@ -36,7 +36,7 @@ This guide explains how to deploy the Mugs Restaurant Management System to Rende
 - **Environment**: Node
 - **Region**: Choose closest to your users
 - **Branch**: main (or your default branch)
-- **Build Command**: `npm install`
+- **Build Command**: `npm run build`
 - **Start Command**: `npm start`
 
 #### Environment Variables: 🔑 **CRITICAL STEP**
@@ -120,6 +120,17 @@ After "Deploy successful" message:
 #### Logs show: "injecting env (0) from .env"
 - **Cause**: Environment variables not set in Render
 - **Solution**: Follow Step 3 again - add environment variables in Render Dashboard
+
+#### Error: "invalid ELF header" or "ERR_DLOPEN_FAILED" for .node files
+- **Cause**: Native modules (like sqlite3) compiled on Windows but running on Linux
+- **Solution**:
+  1. Ensure Build Command is set to: `npm run build`
+  2. This uses `npm ci --clean-slate` to rebuild native modules for Linux
+  3. Do NOT include `node_modules` in your git repository
+  4. Verify `.gitignore` contains: `node_modules`
+  5. Force redeploy: Go to your Render service → click "Manual Deploy" → "Deploy latest"
+  6. Delete `.next` or build cache if present and redeploy
+- **Prevention**: Never commit `node_modules` to git; always let the server rebuild them
 
 ### Automatic Redeploy
 

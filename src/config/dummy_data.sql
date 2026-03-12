@@ -19,7 +19,4 @@ USE restaurant_db;
 -- ('Printer Toner Purchase', 150000.00, 'credit', 3),
 -- ('Airtel Office Internet', 180000.00, 'paid', 2),
 -- ('Staff Allowances', 900000.00, 'credit', 1);
-
-ALTER TABLE sales
-MODIFY COLUMN status ENUM('pending', 'completed', 'cancelled')
-DEFAULT 'pending';
+/
