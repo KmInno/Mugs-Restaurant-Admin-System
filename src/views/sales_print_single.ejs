@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,7 +83,7 @@
     }
 
     .room-number {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
       color: #000;
     }
@@ -102,7 +103,7 @@
     }
 
     .description-text {
-      font-size: 12px;
+      font-size: 22px;
       font-weight: bold;
       color: #000;
       line-height: 1.5;
@@ -150,11 +151,21 @@
         padding: 0;
         margin: 0;
       }
+
       .print-container {
         max-width: 100%;
         margin: 0;
       }
-      .no-print {
+
+      .app-sidebar {
+        display: none;
+      }
+
+      .no-print, .btn {
+        display: none;
+      }
+
+      footer, .app-header {
         display: none;
       }
     }
@@ -191,13 +202,15 @@
     }
   </style>
 </head>
+
 <body>
   <div class="print-container">
     <div class="header">
-      <h1>MUGS CAFE</h1>
+      <h1>FIGOZ</h1>
       <div class="subtitle">Order Receipt</div>
       <div class="subtitle">
-        <%= new Date().toLocaleDateString() %> - <%= new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %>
+        <%= new Date().toLocaleDateString() %> - <%= new Date().toLocaleTimeString('en-US', { hour: '2-digit' ,
+            minute: '2-digit' }) %>
       </div>
     </div>
 
@@ -205,19 +218,25 @@
       <!-- Room Number - Bold & Clear -->
       <div class="room-section">
         <div class="room-label">ROOM NUMBER</div>
-        <div class="room-number"><%= sale.room_number %></div>
+        <div class="room-number">
+          <%= sale.room_number %>
+        </div>
       </div>
 
       <!-- Order Details - Bold & Clear -->
       <div class="description-section">
         <div class="description-label">ORDER DETAILS</div>
-        <div class="description-text"><%= sale.order_details %></div>
+        <div class="description-text">
+          <%= sale.order_details %>
+        </div>
       </div>
 
       <!-- Amount -->
       <div class="amount-section">
         <div class="amount-label">AMOUNT</div>
-        <div class="amount-value"><%= sale.amount %> UGX</div>
+        <div class="amount-value">
+          <%= sale.amount %> UGX
+        </div>
       </div>
 
       <!-- Additional Info -->
@@ -226,28 +245,35 @@
           <span class="label">Order ID:</span>
           <span class="value">#<%= sale.id %></span>
         </div>
-        <div class="detail-row">
+        <div style="font-size: 18px; text-decoration: bold;" class="detail-row">
           <span class="label">Staff:</span>
-          <span class="value"><%= sale.staff_name || sale.staff_id || 'Unknown' %></span>
+          <b><span class="value">
+              <%= sale.staff_name || sale.staff_id || 'Unknown' %>
+            </span></b>
         </div>
         <div class="detail-row">
           <span class="label">Status:</span>
-          <span class="value"><%= sale.status ? sale.status.charAt(0).toUpperCase()+sale.status.slice(1) : 'Pending' %></span>
+          <span class="value">
+            <%= sale.status ? sale.status.charAt(0).toUpperCase()+sale.status.slice(1) : 'Pending' %>
+          </span>
         </div>
-        <div class="detail-row">
+        <div style="font-size: 18px; text-decoration: bold;" class="detail-row">
           <span class="label">Time:</span>
-          <span class="value"><%= new Date(sale.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
+          <b><span class="value">
+              <%= new Date(sale.created_at).toLocaleTimeString('en-US', { hour: '2-digit' , minute: '2-digit' }) %>
+            </span></b>
         </div>
       </div>
 
       <div class="footer">
         <p>Thank you for your order!</p>
+        <p style="margin-top: 8px; font-size: 9px; border-top: 1px solid #ccc; padding-top: 8px;">© 2026 FIGOZ CAFE. All rights reserved.</p>
       </div>
-    <% } else { %>
-      <div style="text-align: center; padding: 40px 20px; font-size: 13px;">
-        Order not found
-      </div>
-    <% } %>
+      <% } else { %>
+        <div style="text-align: center; padding: 40px 20px; font-size: 13px;">
+          Order not found
+        </div>
+        <% } %>
   </div>
 
   <div class="action-buttons no-print">
@@ -255,4 +281,5 @@
     <button class="btn btn-secondary" onclick="window.history.back()"><i class="fa fa-arrow-left"></i> Back</button>
   </div>
 </body>
+
 </html>
