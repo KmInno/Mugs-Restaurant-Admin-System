@@ -1,3 +1,110 @@
+<style>
+  @media (max-width: 768px) {
+    .desktop-table {
+      display: none !important;
+    }
+    .mobile-cards {
+      display: block !important;
+    }
+    .sales-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #2563eb;
+    }
+    .sales-card.lunch {
+      border-left-color: #ffc107;
+    }
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 13px;
+      align-items: flex-start;
+    }
+    .card-row:last-child {
+      border-bottom: none;
+    }
+    .card-label {
+      font-weight: 600;
+      color: #555;
+      min-width: 90px;
+    }
+    .card-value {
+      text-align: right;
+      flex: 1;
+      word-break: break-word;
+      margin-left: 10px;
+      color: #333;
+    }
+    .card-status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .card-status.completed {
+      background: #e8f5f0;
+      color: #28a745;
+    }
+    .card-status.cancelled {
+      background: #fce8e8;
+      color: #dc3545;
+    }
+    .card-status.pending {
+      background: #fffde7;
+      color: #ffc107;
+    }
+    .card-actions {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .card-actions form {
+      display: inline !important;
+      margin: 0 !important;
+    }
+    .card-actions button {
+      padding: 6px 10px;
+      background: #f0f4f8 !important;
+      color: #2563eb !important;
+      border: 1px solid #2563eb !important;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .card-actions a {
+      padding: 6px 10px;
+      background: #2563eb !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+  @media (min-width: 769px) {
+    .mobile-cards {
+      display: none !important;
+    }
+    .desktop-table {
+      display: table !important;
+    }
+  }
+</style>
+
 <div class="page-heading">
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
     <h1>Sales Management</h1>
@@ -52,7 +159,8 @@
 <section style="margin-bottom:24px">
   <h2 style="margin-bottom:12px;font-size:18px"><i class="fa fa-sunrise" style="margin-right:8px;color:#2563eb"></i>Breakfast Orders (Before 12:00 PM)</h2>
   <% if (breakfastOrders && breakfastOrders.length > 0) { %>
-    <div style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #e6edf3">
+    <!-- Desktop Table View -->
+    <div class="desktop-table" style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #e6edf3">
       <table style="width:100%;border-collapse:collapse">
         <thead>
           <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
@@ -94,6 +202,58 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-cards">
+      <% breakfastOrders.forEach(s => { %>
+        <div class="sales-card">
+          <div class="card-row">
+            <span class="card-label">ID:</span>
+            <span class="card-value"><strong>#<%= s.id %></strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Amount:</span>
+            <span class="card-value"><strong><%= s.amount %> UGX</strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Room:</span>
+            <span class="card-value"><strong><%= s.room_number %></strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Details:</span>
+            <span class="card-value"><%= s.order_details %></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Status:</span>
+            <span class="card-value">
+              <span class="card-status <%= (s.status || 'pending').toLowerCase() %>">
+                <%= s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1) : 'Pending' %>
+              </span>
+            </span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Staff:</span>
+            <span class="card-value"><%= s.staff_name || s.staff_id || 'Unknown' %></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Time:</span>
+            <span class="card-value"><%= new Date(s.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
+          </div>
+          <div class="card-actions">
+            <% const statuses = ['completed','cancelled']; %>
+            <% statuses.forEach(st => { %>
+              <% if (st !== (s.status || '').toLowerCase()) { %>
+                <form method="POST" action="/sales/<%= s.id %>/status">
+                  <input type="hidden" name="status" value="<%= st %>">
+                  <button type="submit"><%= st === 'completed' ? '✓' : '✕' %></button>
+                </form>
+              <% } %>
+            <% }) %>
+            <a href="/sales/<%= s.id %>/print" style="display:inline-flex;align-items:center;gap:4px"><i class="fa fa-print"></i></a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
   <% } else { %>
     <div style="background:#f9f9f9;border:1px solid #e6edf3;padding:24px;border-radius:8px;text-align:center;color:#6b7280">
       <i class="fa fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i>
@@ -106,7 +266,8 @@
 <section style="margin-bottom:24px">
   <h2 style="margin-bottom:12px;font-size:18px"><i class="fa fa-sun" style="margin-right:8px;color:#ffc107"></i>Lunch Orders (12:00 PM & Later)</h2>
   <% if (lunchOrders && lunchOrders.length > 0) { %>
-    <div style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #e6edf3">
+    <!-- Desktop Table View -->
+    <div class="desktop-table" style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #e6edf3">
       <table style="width:100%;border-collapse:collapse">
         <thead>
           <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
@@ -147,6 +308,58 @@
           <% }) %>
         </tbody>
       </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-cards">
+      <% lunchOrders.forEach(s => { %>
+        <div class="sales-card lunch">
+          <div class="card-row">
+            <span class="card-label">ID:</span>
+            <span class="card-value"><strong>#<%= s.id %></strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Amount:</span>
+            <span class="card-value"><strong><%= s.amount %> UGX</strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Room:</span>
+            <span class="card-value"><strong><%= s.room_number %></strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Details:</span>
+            <span class="card-value"><%= s.order_details %></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Status:</span>
+            <span class="card-value">
+              <span class="card-status <%= (s.status || 'pending').toLowerCase() %>">
+                <%= s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1) : 'Pending' %>
+              </span>
+            </span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Staff:</span>
+            <span class="card-value"><%= s.staff_name || s.staff_id || 'Unknown' %></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Time:</span>
+            <span class="card-value"><%= new Date(s.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
+          </div>
+          <div class="card-actions">
+            <% const statuses = ['completed','cancelled']; %>
+            <% statuses.forEach(st => { %>
+              <% if (st !== (s.status || '').toLowerCase()) { %>
+                <form method="POST" action="/sales/<%= s.id %>/status">
+                  <input type="hidden" name="status" value="<%= st %>">
+                  <button type="submit"><%= st === 'completed' ? '✓' : '✕' %></button>
+                </form>
+              <% } %>
+            <% }) %>
+            <a href="/sales/<%= s.id %>/print" style="display:inline-flex;align-items:center;gap:4px"><i class="fa fa-print"></i></a>
+          </div>
+        </div>
+      <% }) %>
     </div>
   <% } else { %>
     <div style="background:#f9f9f9;border:1px solid #e6edf3;padding:24px;border-radius:8px;text-align:center;color:#6b7280">

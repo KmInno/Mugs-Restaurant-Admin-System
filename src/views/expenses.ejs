@@ -1,52 +1,302 @@
-<div class="page-heading" style="display:flex;justify-content:space-between;align-items:center">
-  <h1>Expenses</h1>
-  <div>
-    <a class="button" href="/expenses/new">Add Expense</a>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Expenses</title>
+  <style>
+    @media (max-width: 768px) {
+      .desktop-table {
+        display: none !important;
+      }
+      .mobile-cards {
+        display: block !important;
+      }
+      .expense-card {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #f0f4f8;
+      }
+      .expense-card.paid {
+        border-left-color: #28a745;
+      }
+      .expense-card.credit {
+        border-left-color: #ffc107;
+      }
+      .card-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 13px;
+        align-items: flex-start;
+      }
+      .card-row:last-child {
+        border-bottom: none;
+      }
+      .card-label {
+        font-weight: 600;
+        color: #555;
+        min-width: 90px;
+      }
+      .card-value {
+        text-align: right;
+        flex: 1;
+        word-break: break-word;
+        margin-left: 10px;
+        color: #333;
+      }
+      .card-status {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-block;
+      }
+      .card-status.paid {
+        background: #e8f5f0;
+        color: #28a745;
+      }
+      .card-status.credit {
+        background: #fffde7;
+        color: #ffc107;
+      }
+      .card-actions {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 8px;
+      }
+      .card-actions form {
+        display: inline !important;
+        margin: 0 !important;
+        flex: 1;
+      }
+      .card-actions button {
+        width: 100%;
+        padding: 8px 12px;
+        background: #ffc107 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+    @media (min-width: 769px) {
+      .mobile-cards {
+        display: none !important;
+      }
+      .desktop-table {
+        display: table !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-heading">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <h1>Expenses Management</h1>
+      <a href="/expenses/new" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#2563eb;color:white;padding:12px 18px;border-radius:6px;font-weight:600;font-size:14px;transition:all 0.2s;box-shadow:0 2px 4px rgba(37,99,235,0.2);cursor:pointer" onmouseover="this.style.background='#1d4ed8';this.style.boxShadow='0 4px 8px rgba(37,99,235,0.3)'" onmouseout="this.style.background='#2563eb';this.style.boxShadow='0 2px 4px rgba(37,99,235,0.2)'"><i class="fa fa-plus"></i>Add New Expense</a>
+    </div>
   </div>
-</div>
 
-<section class="mb-4">
-  <div class="card">
-    <strong>Today's Total:</strong> <strong><%= totalExpenses || 0 %> UGX</strong>
+  <!-- Summary Stats -->
+  <div class="sales-summary" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:24px">
+    <% 
+      const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      let todayPaidTotal = 0;
+      if (expenses && expenses.length > 0) {
+        expenses.forEach(exp => {
+          const expDate = new Date(exp.created_at).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          if (expDate === today && (exp.status || 'credit') === 'paid') {
+            todayPaidTotal += (exp.amount || 0);
+          }
+        });
+      }
+    %>
+    <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #28a745;padding:16px;border-radius:8px">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-calendar-day" style="margin-right:4px"></i>Today's Paid Expenses</div>
+      <div style="font-size:20px;font-weight:700;color:#0f172a"><%= Math.round(todayPaidTotal) %> UGX</div>
+    </div>
   </div>
-</section>
 
-<section>
-  <h2>All Expenses</h2>
-  <% if (expenses && expenses.length) { %>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Description</th>
-          <th>Amount</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% expenses.forEach(e => { %>
-          <tr>
-            <td><%= e.id %></td>
-            <td><%= e.description %></td>
-            <td><%= e.amount %></td>
-            <td>
-              <% if ((e.status || 'credit') === 'credit') { %>
-                <form method="POST" action="/expenses/<%= e.id %>/status" class="inline-form">
-                  <input type="hidden" name="status" value="paid">
-                  <button class="button secondary" type="submit">Mark Paid</button>
-                </form>
-                <span style="margin-left:6px;color:gray;">Credit</span>
-              <% } else { %>
-                <span style="font-weight:bold;color:green;">Paid</span>
-              <% } %>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+  <% if (expenses && expenses.length > 0) { %>
+    <% 
+      const groupedByDate = {};
+      expenses.forEach(exp => {
+        const date = new Date(exp.created_at);
+        const dateKey = date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        if (!groupedByDate[dateKey]) {
+          groupedByDate[dateKey] = { paid: [], unpaid: [] };
+        }
+        if ((exp.status || 'credit') === 'paid') {
+          groupedByDate[dateKey].paid.push(exp);
+        } else {
+          groupedByDate[dateKey].unpaid.push(exp);
+        }
+      });
+      
+      const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+    %>
+
+    <% sortedDates.forEach(dateKey => { %>
+      <% 
+        const dateExpenses = groupedByDate[dateKey];
+        let dateLabel = dateKey;
+        if (dateKey === today) {
+          dateLabel = 'Today';
+        } else if (dateKey === yesterday) {
+          dateLabel = 'Yesterday';
+        }
+        const paidTotal = dateExpenses.paid.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+        const unpaidTotal = dateExpenses.unpaid.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+      %>
+
+      <section style="margin-bottom:24px">
+        <h2 style="margin-bottom:16px;font-size:18px"><i class="fa fa-calendar-alt" style="margin-right:8px;color:#2563eb"></i><%= dateLabel %>'s Expenses</h2>
+
+        <!-- PAID EXPENSES SECTION -->
+        <% if (dateExpenses.paid && dateExpenses.paid.length > 0) { %>
+          <div style="margin-bottom:20px">
+            <h3 style="margin-bottom:12px;font-size:15px;color:#28a745"><i class="fa fa-check-circle" style="margin-right:6px"></i>Paid Expenses - Total: <strong><%= Math.round(paidTotal) %> UGX</strong></h3>
+            
+            <!-- Desktop Table View -->
+            <div class="desktop-table" style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #e6edf3">
+              <table style="width:100%;border-collapse:collapse">
+                <thead>
+                  <tr style="background:#e8f5f0;border-bottom:2px solid #e6edf3">
+                    <th style="padding:12px 16px;text-align:left;font-weight:600;color:#28a745;font-size:13px">ID</th>
+                    <th style="padding:12px 16px;text-align:left;font-weight:600;color:#28a745;font-size:13px">Description</th>
+                    <th style="padding:12px 16px;text-align:left;font-weight:600;color:#28a745;font-size:13px">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% dateExpenses.paid.forEach(e => { %>
+                    <tr style="border-bottom:1px solid #e6edf3;background:#f9f9f9">
+                      <td style="padding:12px 16px;font-size:13px"><strong>#<%= e.id %></strong></td>
+                      <td style="padding:12px 16px;font-size:13px"><strong><%= e.description %></strong></td>
+                      <td style="padding:12px 16px;font-size:13px;font-weight:600"><%= Math.round(e.amount) %> UGX</td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="mobile-cards">
+              <% dateExpenses.paid.forEach(e => { %>
+                <div class="expense-card paid">
+                  <div class="card-row">
+                    <span class="card-label">ID:</span>
+                    <span class="card-value"><strong>#<%= e.id %></strong></span>
+                  </div>
+                  <div class="card-row">
+                    <span class="card-label">Description:</span>
+                    <span class="card-value"><%= e.description %></span>
+                  </div>
+                  <div class="card-row">
+                    <span class="card-label">Amount:</span>
+                    <span class="card-value"><strong><%= Math.round(e.amount) %> UGX</strong></span>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- UNPAID EXPENSES SECTION -->
+        <% if (dateExpenses.unpaid && dateExpenses.unpaid.length > 0) { %>
+          <div>
+            <h3 style="margin-bottom:12px;font-size:15px;color:#ffc107"><i class="fa fa-exclamation-circle" style="margin-right:6px"></i>Unpaid Expenses - Total: <strong><%= Math.round(unpaidTotal) %> UGX</strong></h3>
+            
+            <!-- Desktop Table View -->
+            <div class="desktop-table" style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #e6edf3">
+              <table style="width:100%;border-collapse:collapse">
+                <thead>
+                  <tr style="background:#fffde7;border-bottom:2px solid #e6edf3">
+                    <th style="padding:12px 16px;text-align:left;font-weight:600;color:#ffc107;font-size:13px">ID</th>
+                    <th style="padding:12px 16px;text-align:left;font-weight:600;color:#ffc107;font-size:13px">Description</th>
+                    <th style="padding:12px 16px;text-align:left;font-weight:600;color:#ffc107;font-size:13px">Amount</th>
+                    <th style="padding:12px 16px;text-align:center;font-weight:600;color:#ffc107;font-size:13px">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% dateExpenses.unpaid.forEach(e => { %>
+                    <tr style="border-bottom:1px solid #e6edf3;background:#f9f9f9">
+                      <td style="padding:12px 16px;font-size:13px"><strong>#<%= e.id %></strong></td>
+                      <td style="padding:12px 16px;font-size:13px"><strong><%= e.description %></strong></td>
+                      <td style="padding:12px 16px;font-size:13px;font-weight:600"><%= Math.round(e.amount) %> UGX</td>
+                      <td style="padding:12px 16px;text-align:center;font-size:13px">
+                        <form method="POST" action="/expenses/<%= e.id %>/status" style="display:inline">
+                          <input type="hidden" name="status" value="paid">
+                          <button type="submit" style="background:#ffc107;color:white;padding:4px 8px;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Mark Paid</button>
+                        </form>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="mobile-cards">
+              <% dateExpenses.unpaid.forEach(e => { %>
+                <div class="expense-card credit">
+                  <div class="card-row">
+                    <span class="card-label">ID:</span>
+                    <span class="card-value"><strong>#<%= e.id %></strong></span>
+                  </div>
+                  <div class="card-row">
+                    <span class="card-label">Description:</span>
+                    <span class="card-value"><%= e.description %></span>
+                  </div>
+                  <div class="card-row">
+                    <span class="card-label">Amount:</span>
+                    <span class="card-value"><strong><%= Math.round(e.amount) %> UGX</strong></span>
+                  </div>
+                  <div class="card-actions">
+                    <form method="POST" action="/expenses/<%= e.id %>/status">
+                      <input type="hidden" name="status" value="paid">
+                      <button type="submit">✓ Mark Paid</button>
+                    </form>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+
+        <% if (!dateExpenses.paid || dateExpenses.paid.length === 0) { %>
+          <div style="background:#f9f9f9;border:1px solid #e6edf3;padding:16px;border-radius:8px;text-align:center;color:#6b7280;margin-bottom:16px">
+            <i class="fa fa-inbox" style="font-size:18px;margin-bottom:6px;display:block"></i>
+            No paid expenses this period.
+          </div>
+        <% } %>
+
+        <% if (!dateExpenses.unpaid || dateExpenses.unpaid.length === 0) { %>
+          <div style="background:#f9f9f9;border:1px solid #e6edf3;padding:16px;border-radius:8px;text-align:center;color:#6b7280">
+            <i class="fa fa-inbox" style="font-size:18px;margin-bottom:6px;display:block"></i>
+            No unpaid expenses this period.
+          </div>
+        <% } %>
+      </section>
+    <% }) %>
+
   <% } else { %>
-    <p>No expenses recorded.</p>
+    <div style="background:#f9f9f9;border:1px solid #e6edf3;padding:24px;border-radius:8px;text-align:center;color:#6b7280;margin-bottom:24px">
+      <i class="fa fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i>
+      No expenses recorded.
+    </div>
   <% } %>
-</section>
 
-<p><a class="button secondary" href="/dashboard">Back to Dashboard</a></p>
+  <div style="margin-top:20px;padding-top:20px;border-top:1px solid #e6edf3">
+    <a href="/dashboard" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#f0f4f8;color:#2563eb;padding:12px 18px;border-radius:6px;font-weight:600;font-size:14px;border:1px solid #e6edf3;transition:all 0.2s;cursor:pointer" onmouseover="this.style.background='#e0e7ff';this.style.borderColor='#2563eb'" onmouseout="this.style.background='#f0f4f8';this.style.borderColor='#e6edf3'"><i class="fa fa-arrow-left"></i>Back to Dashboard</a>
+  </div>
+</body>
+</html>

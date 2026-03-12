@@ -1,11 +1,256 @@
-<div class="card">
-  <h2>Inventory / Stock</h2>
-  <p><a href="/settings">Back to Settings</a></p>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory / Stock</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <p><a href="/settings/inventory/add" class="button">Add Item</a></p>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+      color: #333;
+    }
 
-  <% if (items && items.length) { %>
-    <table class="card" style="width:100%;border-collapse:collapse">
+    h1 {
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .add-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #2563eb;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .add-button:hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .desktop-table {
+      width: 100%;
+      display: none;
+    }
+
+    .mobile-cards {
+      display: none;
+    }
+
+    .inventory-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #2563eb;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 13px;
+      align-items: flex-start;
+    }
+
+    .card-row:last-child {
+      border-bottom: none;
+    }
+
+    .card-label {
+      font-weight: 600;
+      color: #555;
+      min-width: 90px;
+    }
+
+    .card-value {
+      text-align: right;
+      flex: 1;
+      word-break: break-word;
+      margin-left: 10px;
+      color: #333;
+    }
+
+    .card-status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .card-status.instock {
+      background: #e8f5f0;
+      color: #28a745;
+    }
+
+    .card-status.outofstock {
+      background: #fce8e8;
+      color: #dc3545;
+    }
+
+    .card-actions {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .card-actions form {
+      display: inline !important;
+      margin: 0 !important;
+    }
+
+    .card-actions button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .card-actions button:hover {
+      opacity: 0.9;
+    }
+
+    .no-items {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      background: #f9f9f9;
+      border: 1px solid #e6edf3;
+      border-radius: 8px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 12px 18px;
+      background: #f0f4f8;
+      color: #2563eb;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      border: 1px solid #e6edf3;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .back-link:hover {
+      background: #e0e7ff;
+      border-color: #2563eb;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .desktop-table {
+        display: none !important;
+      }
+
+      .mobile-cards {
+        display: block !important;
+      }
+    }
+
+    /* Desktop Styles */
+    @media (min-width: 769px) {
+      .desktop-table {
+        display: table !important;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .desktop-table th,
+      .desktop-table td {
+        border-bottom: 1px solid #e6edf3;
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 13px;
+      }
+
+      .desktop-table th {
+        background: #fbfdff;
+        font-weight: 600;
+        color: #6b7280;
+        border-bottom: 2px solid #e6edf3;
+      }
+
+      .desktop-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .desktop-table tr:nth-child(even) {
+        background: #fafafa;
+      }
+
+      .desktop-table button {
+        padding: 4px 8px;
+        margin-right: 6px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        color: white;
+      }
+
+      .desktop-table form {
+        display: inline !important;
+        margin: 0 !important;
+      }
+
+      .mobile-cards {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1><i class="fa fa-boxes" style="margin-right:8px;color:#2563eb"></i>Inventory / Stock</h1>
+  
+  <a href="/settings/inventory/add" class="add-button">
+    <i class="fa fa-plus"></i>Add New Item
+  </a>
+
+  <% if (items && items.length > 0) { %>
+    <!-- Desktop Table View -->
+    <table class="desktop-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -14,34 +259,89 @@
           <th>Quantity</th>
           <th>Status</th>
           <th>Notes</th>
-          <th>Action</th>
+          <th style="text-align:center;">Actions</th>
         </tr>
       </thead>
       <tbody>
         <% items.forEach(item => { %>
-          <tr>
-            <td><%= item.id %></td>
-            <td><%= item.name %></td>
-            <td><%= item.sku || '' %></td>
-            <td><%= item.quantity %></td>
-            <td><%= item.status %></td>
-            <td><%= item.notes || '' %></td>
+          <tr style="background:<%= item.status === 'instock' ? '#f9f9f9' : '#fef2f2' %>">
+            <td><strong>#<%= item.id %></strong></td>
+            <td><strong><%= item.name %></strong></td>
+            <td><%= item.sku || '-' %></td>
+            <td><strong><%= item.quantity %></strong></td>
             <td>
-              <form method="post" action="/settings/inventory/<%= item.id %>/status" style="display:inline">
-                <% if (item.status === 'instock') { %>
-                  <input type="hidden" name="status" value="outofstock" />
-                  <button class="button" type="submit">Mark Out of Stock</button>
-                <% } else { %>
-                  <input type="hidden" name="status" value="instock" />
-                  <button class="button" type="submit">Mark In Stock</button>
-                <% } %>
+              <% if (item.status === 'instock') { %>
+                <span style="background:#e8f5f0;color:#28a745;padding:4px 8px;border-radius:4px;font-weight:600;font-size:11px"><i class="fa fa-check-circle" style="margin-right:4px"></i>In Stock</span>
+              <% } else { %>
+                <span style="background:#fce8e8;color:#dc3545;padding:4px 8px;border-radius:4px;font-weight:600;font-size:11px"><i class="fa fa-times-circle" style="margin-right:4px"></i>Out of Stock</span>
+              <% } %>
+            </td>
+            <td><%= item.notes || '-' %></td>
+            <td style="text-align:center;">
+              <form method="POST" action="/settings/inventory/<%= item.id %>/status">
+                <input type="hidden" name="status" value="<%= item.status === 'instock' ? 'outofstock' : 'instock' %>">
+                <button type="submit" style="background:<%= item.status === 'instock' ? '#ffc107' : '#28a745' %>"><%= item.status === 'instock' ? 'Mark Out' : 'Mark In' %></button>
               </form>
             </td>
           </tr>
         <% }) %>
       </tbody>
     </table>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-cards">
+      <% items.forEach(item => { %>
+        <div class="inventory-card">
+          <div class="card-row">
+            <span class="card-label">ID:</span>
+            <span class="card-value"><strong>#<%= item.id %></strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Name:</span>
+            <span class="card-value"><strong><%= item.name %></strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">SKU:</span>
+            <span class="card-value"><%= item.sku || '-' %></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Quantity:</span>
+            <span class="card-value"><strong><%= item.quantity %></strong></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Status:</span>
+            <span class="card-value">
+              <span class="card-status <%= item.status %>">
+                <% if (item.status === 'instock') { %>
+                  <i class="fa fa-check-circle" style="margin-right:4px"></i>In Stock
+                <% } else { %>
+                  <i class="fa fa-times-circle" style="margin-right:4px"></i>Out of Stock
+                <% } %>
+              </span>
+            </span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Notes:</span>
+            <span class="card-value"><%= item.notes || '-' %></span>
+          </div>
+          <div class="card-actions">
+            <form method="POST" action="/settings/inventory/<%= item.id %>/status">
+              <input type="hidden" name="status" value="<%= item.status === 'instock' ? 'outofstock' : 'instock' %>">
+              <button type="submit" style="background:<%= item.status === 'instock' ? '#ffc107' : '#28a745' %>"><%= item.status === 'instock' ? 'Mark Out' : 'Mark In' %></button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
   <% } else { %>
-    <p>No inventory items yet.</p>
+    <div class="no-items">
+      <i class="fa fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i>
+      No inventory items yet.
+    </div>
   <% } %>
-</div>
+
+  <a href="/settings" class="back-link">
+    <i class="fa fa-arrow-left"></i>Back to Settings
+  </a>
+</body>
+</html>
