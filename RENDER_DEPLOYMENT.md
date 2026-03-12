@@ -83,22 +83,39 @@ After "Deploy successful" message:
 
 ### Troubleshooting
 
-#### Error: "Exited with status 1"
-- **Cause**: Missing environment variables
-- **Solution**: Check you added ALL environment variables in Step 3
-- **Fix**: 
-  1. Go to service settings
-  2. Check "Environment" tab
-  3. Add any missing variables
-  4. Click "Deploy" button to redeploy
+#### Error: "Connection timeout - database server is not responding"
+- **Cause**: Azure MySQL firewall not allowing Render's IP
+- **Solution for Azure MySQL**: 
+  1. Go to Azure Portal → Your MySQL Server
+  2. Click "Connection security" or "Networking"
+  3. Click "Add current client IP" or add Render's IP manually
+  4. For broad access: Add rule with Start IP: 0.0.0.0, End IP: 255.255.255.255
+     - **⚠️ Warning**: This opens to all IPs - only for testing
+  5. For production: Whitelist only Render's output IP
+  6. Click "Save" and wait 1-2 minutes for firewall to update
 
-#### Error: "Database connection failed"
-- **Cause**: Wrong credentials or database unreachable
-- **Solution**: 
-  1. Verify credentials are correct
-  2. Ask your database provider if they block external connections
-  3. For Azure MySQL: ensure IP is whitelisted (Render might need to whitelist it)
-  4. Check database port is 3306 (not 3307)
+#### Error: "Access denied for user"
+- **Cause**: Wrong credentials (DB_USER, DB_PASS)
+- **Solution**:
+  1. Verify credentials in Azure Portal
+  2. Check that credentials are copied exactly (watch for spaces)
+  3. Ensure password doesn't have special characters that need escaping
+  4. Re-deploy after updating
+
+#### Error: "Unknown database"
+- **Cause**: Database name is wrong or database doesn't exist
+- **Solution**:
+  1. Check DB_NAME matches database name in Azure MySQL
+  2. Verify database was created: `SHOW DATABASES;`
+  3. If missing, create it: `CREATE DATABASE restaurant_db;`
+  4. Run migrations: `npm run migrate` (if you add this script)
+
+#### Connection works locally but fails on Render
+- **Cause**: SSL/TLS configuration or firewall differences
+- **Solution**:
+  1. Check Azure firewall allows broad IP range (temporary)
+  2. Verify all environment variables exactly match local .env
+  3. Check .env file has `DB_PORT=3306` not 3307
 
 #### Logs show: "injecting env (0) from .env"
 - **Cause**: Environment variables not set in Render
