@@ -8,7 +8,14 @@ async function initializeDatabase() {
             user: process.env.DB_USER || 'root',
             password: process.env.DB_PASS || 'root',
             database: process.env.DB_NAME || 'restaurant_db',
-            port: process.env.DB_PORT || 3307
+            port: process.env.DB_PORT || 3307,
+            ssl: process.env.DB_HOST && process.env.DB_HOST.includes('azure') ? {
+                rejectUnauthorized: true,
+                ca: undefined // Azure uses standard certificates
+            } : false,
+            waitForConnections: true,
+            connectionLimit: 5,
+            queueLimit: 0
         });
 
         console.log("Connected to MySQL database");
