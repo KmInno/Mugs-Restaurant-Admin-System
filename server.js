@@ -3,6 +3,7 @@ const initializeDatabase = require('./src/config/db');
 
 let initialized = false;
 
+// Serverless handler for production (Vercel, etc.)
 module.exports = async (req, res) => {
   try {
     if (!initialized) {
@@ -19,3 +20,16 @@ module.exports = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
+
+// Local development server
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    initializeDatabase().catch(err => {
+      console.error('❌ Failed to initialize database:', err);
+      process.exit(1);
+    });
+  });
+}
