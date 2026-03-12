@@ -1,10 +1,20 @@
 const templateModel = require('../models/expenseTemplateModel');
 const inventoryModel = require('../models/inventoryModel');
+const userModel = require('../models/userModel');
 const logger = require('../utils/logger');
 
 async function showSettings(req, res) {
     try {
-        res.render('settings', { title: 'Settings' });
+        // Only admin can view users
+        const isAdmin = req.session && req.session.user && req.session.user.role === 'admin';
+        let users = [];
+        const currentUserId = req.session && req.session.user ? req.session.user.id : null;
+        
+        if (isAdmin) {
+            users = await userModel.getAllUsers();
+        }
+        
+        res.render('settings', { title: 'Settings', users, isAdmin, currentUserId });
     } catch (err) {
         logger.error('Error rendering settings: ' + (err && err.message ? err.message : err));
         res.status(500).send('Unable to load settings');
@@ -84,6 +94,23 @@ async function deleteTemplate(req, res) {
     }
 }
 
+async function deleteUser(req, res) {
+    try {
+        const userId = req.params.id;
+        
+        // Prevent deleting self
+        if (req.session.user.id == userId) {
+            return res.status(400).send('Cannot delete your own account');
+        }
+        
+        await userModel.deleteUser(userId);
+        res.redirect('/settings');
+    } catch (err) {
+        logger.error('Error deleting user: ' + (err && err.message ? err.message : err));
+        res.status(500).send('Failed to delete user');
+    }
+}
+
 async function showInventory(req, res) {
     try {
         const items = await inventoryModel.getAllItems();
@@ -137,6 +164,7 @@ module.exports = {
     showEditTemplate,
     updateTemplate,
     deleteTemplate,
+    deleteUser,
     showInventory,
     showAddInventory,
     createInventoryItem,

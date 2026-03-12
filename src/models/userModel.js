@@ -59,5 +59,26 @@ async function getAccountById(id) {
   }
 }
 
+async function getAllUsers() {
+  const db = await initializeDatabase();
+  try {
+    const [rows] = await db.execute('SELECT id, name, email, role FROM users ORDER BY id DESC');
+    return rows;
+  } catch (error) {
+    console.error('Error fetching all users:', error);
+    throw error;
+  }
+}
 
-module.exports = { findUserByEmail, createUser, getAccountByEmail, getAccountById };
+async function deleteUser(userId) {
+  const db = await initializeDatabase();
+  try {
+    const [result] = await db.execute('DELETE FROM users WHERE id = ?', [userId]);
+    return result;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+}
+
+module.exports = { findUserByEmail, createUser, getAccountByEmail, getAccountById, getAllUsers, deleteUser };

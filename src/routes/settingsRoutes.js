@@ -7,6 +7,7 @@ const requireRole = require('../middleware/roleMiddleware');
 // Settings main
 // Make settings admin-only
 router.get('/settings', authMiddleware, requireRole(['admin']), settingsController.showSettings);
+router.post('/settings/user/:id/delete', authMiddleware, requireRole(['admin']), settingsController.deleteUser);
 
 // Expense templates
 router.get('/settings/expenses/templates', authMiddleware, requireRole(['admin']), settingsController.showExpenseTemplates);
