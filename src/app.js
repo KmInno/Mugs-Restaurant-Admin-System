@@ -6,7 +6,8 @@ require('dotenv').config();
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const flash = require('connect-flash');
-const SQLiteStore = require('connect-sqlite3')(session);
+const MySQLStore = require('express-mysql-session')(session);
+const mysql = require('mysql2/promise');
 
 const authRoutes = require('./routes/authRoutes');
 const saleRoutes = require('./routes/saleRoutes');
@@ -32,9 +33,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// MySQL connection pool for sessions
+const connectionPool = mysql.createPool({
+  connectionLimit: 10,
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASS || "",
+  database: process.env.DB_NAME || "restaurant_db",
+  port: process.env.DB_PORT || 3306,
+  connectTimeout: 30000,
+  waitForConnectionsTimeout: 30000,
+  ssl: process.env.DB_HOST && process.env.DB_HOST.includes("azure")
+    ? { rejectUnauthorized: false }
+    : false
+});
+
 // Session middleware
 app.use(session({
-  store: new SQLiteStore({ db: 'sessions.sqlite', dir: './src/config' }),
+  store: new MySQLStore({}, connectionPool),
   secret: process.env.SESSION_SECRET || 'default_secret',
   resave: false,
   saveUninitialized: false,

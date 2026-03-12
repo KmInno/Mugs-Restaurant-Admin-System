@@ -9,6 +9,7 @@ async function initializeDatabase() {
             password: process.env.DB_PASS || "",
             database: process.env.DB_NAME || "restaurant_db",
             port: process.env.DB_PORT || 3306,
+            connectTimeout: 30000,
             ssl: process.env.DB_HOST && process.env.DB_HOST.includes("azure")
                 ? { rejectUnauthorized: false }
                 : false
