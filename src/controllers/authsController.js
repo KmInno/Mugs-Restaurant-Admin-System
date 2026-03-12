@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
 
 async function buildLogin(req, res, next) {
-  res.render('login', { title: 'Login' });
+  res.render('login', { title: 'Login', messages: req.flash() });
 }
 
 async function buildSignup(req, res, next) {

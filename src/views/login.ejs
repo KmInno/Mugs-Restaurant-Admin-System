@@ -2,6 +2,10 @@
   <div class="form-card card form-small">
     <h2>Login</h2>
 
+    <% if (messages && messages.success) { %>
+      <div class="alert" style="background:#e8f5f0;border:1px solid #28a745;color:#1b5e20"><%= messages.success.join(', ') %></div>
+    <% } %>
+
     <% if (messages && messages.error) { %>
       <div class="alert"><%= messages.error.join(', ') %></div>
     <% } %>
