@@ -1,0 +1,185 @@
+<div class="clearance-page">
+  <header class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title"><i class="fa fa-handshake icon"></i>Staff Clearance & Settlement</h1>
+      <p class="text-muted">Daily staff payment clearance and debt tracking</p>
+    </div>
+    <div class="dashboard-actions">
+      <a href="/clearance/debts" class="button secondary"><i class="fa fa-exclamation-circle"></i>View Unpaid Debts</a>
+    </div>
+  </header>
+
+  <!-- Date Selector -->
+  <div class="clearance-controls" style="margin-bottom:20px">
+    <form method="GET" action="/clearance" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <label style="margin:0;font-weight:600">Select Date:</label>
+      <input type="date" name="date" value="<%= selectedDate %>" style="padding:10px;border:1px solid #e6edf3;border-radius:6px;font-size:14px">
+      <button type="submit" class="button" style="min-width:100px">Filter</button>
+    </form>
+  </div>
+
+  <!-- Summary Statistics -->
+  <div class="clearance-summary" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:24px">
+    <div class="stat-card" style="background:linear-gradient(135deg, #f8f9fa 0%, #e8f1ff 100%);border-left:4px solid #2563eb;padding:16px;border-radius:8px">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:6px;font-weight:500"><i class="fa fa-users" style="margin-right:4px"></i>Staff Members</div>
+      <div style="font-size:24px;font-weight:700;color:#0f172a"><%= totals.totalStaff %></div>
+    </div>
+    <div class="stat-card" style="background:linear-gradient(135deg, #f8f9fa 0%, #e8f5f0 100%);border-left:4px solid #28a745;padding:16px;border-radius:8px">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:6px;font-weight:500"><i class="fa fa-dollar-sign" style="margin-right:4px"></i>Total Sales</div>
+      <div style="font-size:24px;font-weight:700;color:#0f172a"><%= totals.totalSales.toFixed(2) %> UGX</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px"><%= totals.totalOrders %> orders</div>
+    </div>
+    <div class="stat-card" style="background:linear-gradient(135deg, #f8f9fa 0%, #e8f5e8 100%);border-left:4px solid #17a2b8;padding:16px;border-radius:8px">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:6px;font-weight:500"><i class="fa fa-check-circle" style="margin-right:4px"></i>Paid Amount</div>
+      <div style="font-size:20px;font-weight:700;color:#28a745"><%= totals.totalPaid.toFixed(2) %> UGX</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px"><%= totals.totalPaidCount %> transactions</div>
+    </div>
+    <div class="stat-card" style="background:linear-gradient(135deg, #f8f9fa 0%, #fef0e8 100%);border-left:4px solid #ffc107;padding:16px;border-radius:8px">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:6px;font-weight:500"><i class="fa fa-clock" style="margin-right:4px"></i>Unpaid Amount</div>
+      <div style="font-size:20px;font-weight:700;color:#ffc107"><%= totals.totalUnpaid.toFixed(2) %> UGX</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px"><%= totals.totalUnpaidCount %> transactions</div>
+    </div>
+  </div>
+
+  <!-- Staff Clearance Table -->
+  <div style="background:white;border-radius:8px;border:1px solid #e6edf3;overflow-x:auto">
+    <h2 style="padding:16px 16px 0;margin:0;font-size:18px"><i class="fa fa-table"></i>Daily Staff Settlement</h2>
+    
+    <% if (staffClearance && staffClearance.length > 0) { %>
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Staff Name</th>
+            <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Total Orders</th>
+            <th style="padding:12px 16px;text-align:right;font-weight:600;color:#6b7280;font-size:13px">Total Sales</th>
+            <th style="padding:12px 16px;text-align:right;font-weight:600;color:#28a745;font-size:13px">Paid</th>
+            <th style="padding:12px 16px;text-align:right;font-weight:600;color:#ffc107;font-size:13px">Unpaid</th>
+            <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Status</th>
+            <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% staffClearance.forEach((staff, idx) => { %>
+            <% const isPaid = staff.unpaid_count === 0 && staff.total_orders > 0; %>
+            <% const statusColor = isPaid ? '#28a745' : (staff.unpaid_count > 0 ? '#ffc107' : '#9ca3af'); %>
+            <% const statusBg = isPaid ? '#e8f5e9' : (staff.unpaid_count > 0 ? '#fff8e1' : '#f3f4f6'); %>
+            <tr style="border-bottom:1px solid #e6edf3;background:<%= statusBg %>;">
+              <td style="padding:12px 16px;font-size:13px;font-weight:500">
+                <a href="/clearance/<%= staff.staff_id %>/details?date=<%= selectedDate %>" style="color:#2563eb;text-decoration:none;cursor:pointer">
+                  <%= staff.staff_name %>
+                </a>
+              </td>
+              <td style="padding:12px 16px;text-align:center;font-size:13px">
+                <% if (staff.total_orders > 0) { %>
+                  <span style="background:#e8f1ff;color:#2563eb;padding:4px 12px;border-radius:20px;font-weight:600"><%= staff.total_orders %></span>
+                <% } else { %>
+                  <span style="color:#9ca3af">-</span>
+                <% } %>
+              </td>
+              <td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:600"><%= parseFloat(staff.total_sales).toFixed(2) %> UGX</td>
+              <td style="padding:12px 16px;text-align:right;font-size:13px;color:#28a745;font-weight:600">
+                <i class="fa fa-check-circle"></i> <%= parseFloat(staff.paid_amount).toFixed(2) %> UGX
+                <br>
+                <span style="font-size:11px;color:#6b7280">(<%= staff.paid_count %> orders)</span>
+              </td>
+              <td style="padding:12px 16px;text-align:right;font-size:13px;color:#ffc107;font-weight:600">
+                <i class="fa fa-exclamation-circle"></i> <%= parseFloat(staff.unpaid_amount).toFixed(2) %> UGX
+                <br>
+                <span style="font-size:11px;color:#6b7280">(<%= staff.unpaid_count %> orders)</span>
+              </td>
+              <td style="padding:12px 16px;text-align:center;font-size:13px">
+                <% if (isPaid && staff.total_orders > 0) { %>
+                  <span style="color:#28a745;font-weight:600"><i class="fa fa-check"></i> Cleared</span>
+                <% } else if (staff.unpaid_count > 0) { %>
+                  <span style="color:#ffc107;font-weight:600"><i class="fa fa-exclamation"></i> Pending</span>
+                <% } else { %>
+                  <span style="color:#9ca3af">No Sales</span>
+                <% } %>
+              </td>
+              <td style="padding:12px 16px;text-align:center">
+                <a href="/clearance/<%= staff.staff_id %>/details?date=<%= selectedDate %>" class="button secondary" style="padding:6px 12px;font-size:12px">View Details</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div style="padding:40px;text-align:center;color:#6b7280">
+        <i class="fa fa-inbox" style="font-size:32px;margin-bottom:12px;display:block;color:#9ca3af"></i>
+        <p>No sales recorded for <%= selectedDate %></p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<style>
+.clearance-page {
+  padding: 0;
+}
+
+.clearance-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e6edf3;
+  margin-bottom: 20px;
+}
+
+.clearance-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .clearance-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .clearance-controls input,
+  .clearance-controls button {
+    width: 100%;
+  }
+
+  .clearance-summary {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .clearance-controls {
+    flex-direction: column;
+  }
+
+  .clearance-controls label {
+    font-size: 12px;
+  }
+
+  .clearance-controls input,
+  .clearance-controls button {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .clearance-summary {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  table th,
+  table td {
+    padding: 8px 10px;
+  }
+}
+</style>

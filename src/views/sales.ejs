@@ -1,62 +1,161 @@
 <div class="page-heading">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h1>Sales</h1>
-    <div>
-      <a class="button" href="/sales/add">Add New Sale</a>
-      <a class="button secondary" href="/sales/debtors">View Debtors</a>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <h1>Sales Management</h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="button" href="/sales/add"><i class="fa fa-plus" style="margin-right:4px"></i>Add New Sale</a>
+      <a class="button secondary" href="/sales/debtors"><i class="fa fa-users" style="margin-right:4px"></i>View Debtors</a>
+      <a class="button secondary" href="/sales/print"><i class="fa fa-print" style="margin-right:4px"></i>Print Orders</a>
     </div>
   </div>
 </div>
 
-<section class="mb-4">
-  <div class="card">
-    <strong>Today's Total:</strong> <span class="text-muted">Total Sales Today:</span> <strong><%= typeof totalSales !== 'undefined' ? totalSales : 0 %> UGX</strong>
-  </div>
-</section>
+<!-- Period Selection Tabs -->
+<div class="sales-tabs" style="margin-bottom:20px;border-bottom:2px solid #e6edf3;display:flex;gap:0">
+  <a href="/sales?period=daily" class="tab-link <%= period === 'daily' ? 'active' : '' %>" style="padding:12px 20px;border-bottom:3px solid <%= period === 'daily' ? '#2563eb' : 'transparent' %>;cursor:pointer;text-decoration:none;color:<%= period === 'daily' ? '#2563eb' : '#6b7280' %>;font-weight:<%= period === 'daily' ? '600' : '500' %>">
+    <i class="fa fa-calendar-day"></i> Daily
+  </a>
+  <a href="/sales?period=weekly" class="tab-link <%= period === 'weekly' ? 'active' : '' %>" style="padding:12px 20px;border-bottom:3px solid <%= period === 'weekly' ? '#2563eb' : 'transparent' %>;cursor:pointer;text-decoration:none;color:<%= period === 'weekly' ? '#2563eb' : '#6b7280' %>;font-weight:<%= period === 'weekly' ? '600' : '500' %>">
+    <i class="fa fa-calendar-week"></i> Weekly
+  </a>
+  <a href="/sales?period=monthly" class="tab-link <%= period === 'monthly' ? 'active' : '' %>" style="padding:12px 20px;border-bottom:3px solid <%= period === 'monthly' ? '#2563eb' : 'transparent' %>;cursor:pointer;text-decoration:none;color:<%= period === 'monthly' ? '#2563eb' : '#6b7280' %>;font-weight:<%= period === 'monthly' ? '600' : '500' %>">
+    <i class="fa fa-calendar"></i> Monthly
+  </a>
+</div>
 
-<section>
-  <h2>All Sales</h2>
-  <% if (sales && sales.length) { %>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Amount</th>
-          <th>Room</th>
-          <th>Order Details</th>
-          <th>Status</th>
-          <th>Staff</th>
-          <th>Created At</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% sales.forEach(s => { %>
-          <tr>
-            <td><%= s.id %></td>
-            <td><%= s.amount %></td>
-            <td><%= s.room_number %></td>
-            <td><%= s.order_details %></td>
-            <td>
-              <% const statuses = ['completed','cancelled']; %>
-              <% statuses.forEach(st => { %>
-                <% if (st !== s.status) { %>
-                  <form method="POST" action="/sales/<%= s.id %>/status" class="inline-form" style="margin-right:6px;display:inline-block">
-                    <input type="hidden" name="status" value="<%= st %>">
-                    <button class="button secondary" type="submit"><%= st.charAt(0).toUpperCase() + st.slice(1) %></button>
-                  </form>
-                <% } %>
-              <% }) %>
-              <span style="margin-left:6px;font-weight:bold;"><%= s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : 'Pending' %></span>
-            </td>
-            <td><%= s.staff_name || s.staff_id || 'Unknown' %></td>
-            <td><%= s.created_at %></td>
+<!-- Summary Stats -->
+<div class="sales-summary" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;margin-bottom:20px">
+  <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #2563eb;padding:16px;border-radius:8px">
+    <div style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-utensils" style="margin-right:4px"></i>Breakfast Orders</div>
+    <div style="font-size:20px;font-weight:700;color:#0f172a"><%= breakfastCount || 0 %> orders</div>
+    <div style="font-size:14px;font-weight:600;color:#2563eb;margin-top:4px"><%= breakfastTotal || 0 %> UGX</div>
+  </div>
+  <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #ffc107;padding:16px;border-radius:8px">
+    <div style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-dinner" style="margin-right:4px"></i>Lunch Orders</div>
+    <div style="font-size:20px;font-weight:700;color:#0f172a"><%= lunchCount || 0 %> orders</div>
+    <div style="font-size:14px;font-weight:600;color:#ffc107;margin-top:4px"><%= lunchTotal || 0 %> UGX</div>
+  </div>
+  <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #28a745;padding:16px;border-radius:8px">
+    <div style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-chart-line" style="margin-right:4px"></i>Total <%= periodLabel %></div>
+    <div style="font-size:20px;font-weight:700;color:#0f172a"><%= totalSales || 0 %> UGX</div>
+    <div style="font-size:14px;color:#28a745;margin-top:4px;font-weight:600"><%= allSales ? allSales.length : 0 %> transactions</div>
+  </div>
+  <% if (typeof totalDebtors !== 'undefined' && totalDebtors > 0) { %>
+    <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #dc3545;padding:16px;border-radius:8px">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-exclamation-circle" style="margin-right:4px"></i>Debtors</div>
+      <div style="font-size:20px;font-weight:700;color:#0f172a"><%= totalDebtors || 0 %> UGX</div>
+      <div style="font-size:12px;color:#dc3545;margin-top:4px">Pending payments</div>
+    </div>
+  <% } %>
+</div>
+
+<!-- Breakfast Orders Table -->
+<section style="margin-bottom:24px">
+  <h2 style="margin-bottom:12px;font-size:18px"><i class="fa fa-sunrise" style="margin-right:8px;color:#2563eb"></i>Breakfast Orders (Before 12:00 PM)</h2>
+  <% if (breakfastOrders && breakfastOrders.length > 0) { %>
+    <div style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #e6edf3">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">ID</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Amount</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Room</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Order Details</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Status</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Staff</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Time</th>
+            <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Print</th>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% breakfastOrders.forEach(s => { %>
+            <tr style="border-bottom:1px solid #e6edf3;background:<%= s.status === 'completed' ? '#e8f5f0' : (s.status === 'cancelled' ? '#fce8e8' : '#f9f9f9') %>">
+              <td style="padding:12px 16px;font-size:13px"><strong>#<%= s.id %></strong></td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:600"><%= s.amount %> UGX</td>
+              <td style="padding:12px 16px;font-size:13px"><strong><%= s.room_number %></strong></td>
+              <td style="padding:12px 16px;font-size:13px"><strong><%= s.order_details %></strong></td>
+              <td style="padding:12px 16px;font-size:13px">
+                <% const statuses = ['completed','cancelled']; %>
+                <% let hasButtons = false; %>
+                <% statuses.forEach(st => { %>
+                  <% if (st !== (s.status || '').toLowerCase()) { hasButtons = true; %>
+                    <form method="POST" action="/sales/<%= s.id %>/status" style="display:inline;margin-right:4px">
+                      <input type="hidden" name="status" value="<%= st %>">
+                      <button type="submit" style="background:#f0f4f8;color:#2563eb;padding:4px 8px;border:1px solid #2563eb;border-radius:4px;cursor:pointer;font-size:11px;font-weight:500"><%= st.charAt(0).toUpperCase() + st.slice(1) %></button>
+                    </form>
+                  <% } %>
+                <% }) %>
+                <span style="font-weight:600;color:<%= s.status === 'completed' ? '#28a745' : (s.status === 'cancelled' ? '#dc3545' : '#ffc107') %>"><%= s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : 'Pending' %></span>
+              </td>
+              <td style="padding:12px 16px;font-size:13px"><%= s.staff_name || s.staff_id || 'Unknown' %></td>
+              <td style="padding:12px 16px;font-size:13px"><%= new Date(s.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></td>
+              <td style="padding:12px 16px;text-align:center;font-size:13px"><a href="/sales/<%= s.id %>/print" class="button" style="background:#2563eb;color:white;padding:4px 8px;border-radius:4px;text-decoration:none;font-size:11px;font-weight:600;display:inline-block"><i class="fa fa-print"></i></a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
   <% } else { %>
-    <p>No sales recorded.</p>
+    <div style="background:#f9f9f9;border:1px solid #e6edf3;padding:24px;border-radius:8px;text-align:center;color:#6b7280">
+      <i class="fa fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i>
+      No breakfast orders recorded.
+    </div>
   <% } %>
 </section>
 
-<p><a class="button secondary" href="/dashboard">Back to Dashboard</a></p>
+<!-- Lunch Orders Table -->
+<section style="margin-bottom:24px">
+  <h2 style="margin-bottom:12px;font-size:18px"><i class="fa fa-sun" style="margin-right:8px;color:#ffc107"></i>Lunch Orders (12:00 PM & Later)</h2>
+  <% if (lunchOrders && lunchOrders.length > 0) { %>
+    <div style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #e6edf3">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">ID</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Amount</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Room</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Order Details</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Status</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Staff</th>
+            <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Time</th>
+            <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Print</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% lunchOrders.forEach(s => { %>
+            <tr style="border-bottom:1px solid #e6edf3;background:<%= s.status === 'completed' ? '#e8f5f0' : (s.status === 'cancelled' ? '#fce8e8' : '#f9f9f9') %>">
+              <td style="padding:12px 16px;font-size:13px"><strong>#<%= s.id %></strong></td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:600"><%= s.amount %> UGX</td>
+              <td style="padding:12px 16px;font-size:13px"><strong><%= s.room_number %></strong></td>
+              <td style="padding:12px 16px;font-size:13px"><strong><%= s.order_details %></strong></td>
+              <td style="padding:12px 16px;font-size:13px">
+                <% const statuses = ['completed','cancelled']; %>
+                <% let hasButtons = false; %>
+                <% statuses.forEach(st => { %>
+                  <% if (st !== (s.status || '').toLowerCase()) { hasButtons = true; %>
+                    <form method="POST" action="/sales/<%= s.id %>/status" style="display:inline;margin-right:4px">
+                      <input type="hidden" name="status" value="<%= st %>">
+                      <button type="submit" style="background:#f0f4f8;color:#2563eb;padding:4px 8px;border:1px solid #2563eb;border-radius:4px;cursor:pointer;font-size:11px;font-weight:500"><%= st.charAt(0).toUpperCase() + st.slice(1) %></button>
+                    </form>
+                  <% } %>
+                <% }) %>
+                <span style="font-weight:600;color:<%= s.status === 'completed' ? '#28a745' : (s.status === 'cancelled' ? '#dc3545' : '#ffc107') %>"><%= s.status ? s.status.charAt(0).toUpperCase()+s.status.slice(1) : 'Pending' %></span>
+              </td>
+              <td style="padding:12px 16px;font-size:13px"><%= s.staff_name || s.staff_id || 'Unknown' %></td>
+              <td style="padding:12px 16px;font-size:13px"><%= new Date(s.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></td>
+              <td style="padding:12px 16px;text-align:center;font-size:13px"><a href="/sales/<%= s.id %>/print" class="button" style="background:#2563eb;color:white;padding:4px 8px;border-radius:4px;text-decoration:none;font-size:11px;font-weight:600;display:inline-block"><i class="fa fa-print"></i></a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div style="background:#f9f9f9;border:1px solid #e6edf3;padding:24px;border-radius:8px;text-align:center;color:#6b7280">
+      <i class="fa fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i>
+      No lunch orders recorded.
+    </div>
+  <% } %>
+</section>
+
+<div style="margin-top:20px;padding-top:20px;border-top:1px solid #e6edf3">
+  <a href="/dashboard" class="button secondary"><i class="fa fa-arrow-left" style="margin-right:4px"></i>Back to Dashboard</a>
+</div>

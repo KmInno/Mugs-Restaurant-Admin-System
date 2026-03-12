@@ -18,6 +18,8 @@ CREATE TABLE sales (
   order_details TEXT NOT NULL,
   amount DECIMAL(10,2) NOT NULL,
   staff_id INT NOT NULL,
+  status VARCHAR(50) DEFAULT 'pending',
+  payment_status VARCHAR(50) DEFAULT 'unpaid',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (staff_id) REFERENCES users(id)
 );

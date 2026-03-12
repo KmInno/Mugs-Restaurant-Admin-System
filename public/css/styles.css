@@ -13,52 +13,138 @@ body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica
 .app-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--card);box-shadow:0 1px 0 rgba(15,23,42,0.02)}
 .brand-title{font-weight:700;font-size:18px;color:var(--text)}
 .page-title{font-size:15px;color:var(--muted)}
+.brand-desc{font-size:12px;color:var(--muted);margin-top:4px}
+
+@media (max-width:640px){
+  .app-header{padding:12px 16px;gap:8px}
+  .brand-title{font-size:16px}
+  .page-title{font-size:13px}
+}
 
 .app-layout{display:flex;align-items:flex-start;gap:24px;max-width:1200px;margin:20px auto;padding:0 16px}
 .app-sidebar{width:220px;flex:0 0 220px}
 .app-main{flex:1}
 
+@media (max-width:768px){
+  .app-layout{gap:16px;padding:0 12px;margin:16px auto}
+}
+
+@media (max-width:640px){
+  .app-sidebar{width:100%}
+}
+
 .app-nav{border:1px solid var(--border);padding:14px;border-radius:8px;background:var(--card)}
 .app-nav h3{margin:0 0 8px 0;font-size:15px}
 .app-nav ul{list-style:none;padding:0;margin:0}
 .app-nav li{margin:6px 0}
-.app-nav a{color:var(--accent);text-decoration:none}
-.app-nav a:hover{text-decoration:underline}
+.app-nav a{color:var(--accent);text-decoration:none;display:block;padding:6px 4px;border-radius:4px;transition:background 0.2s}
+.app-nav a:hover{background:#f0f4f8;text-decoration:underline}
+
+@media (max-width:640px){
+  .app-nav{padding:12px}
+  .app-nav h3{font-size:14px;margin-bottom:6px}
+  .app-nav li{margin:4px 0}
+  .app-nav a{padding:8px 6px;font-size:14px}
+}
 
 main.app-main{background:transparent}
 
 footer{max-width:1200px;margin:24px auto;padding:10px 16px;color:var(--muted);font-size:13px}
 
+@media (max-width:640px){
+  footer{padding:8px 12px;font-size:12px;margin:12px auto}
+}
+
 .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px}
+
+@media (max-width:640px){
+  .card{padding:12px;border-radius:6px}
+}
 
 /* Icon helpers */
 .icon{margin-right:8px}
 .icon-sm{margin-right:6px;font-size:14px;vertical-align:middle}
 .dashboard-actions .button .fa{vertical-align:middle}
 
+@media (max-width:640px){
+  .icon{margin-right:4px}
+  .icon-sm{margin-right:3px}
+}
+
 /* Forms */
 label{display:block;margin-bottom:6px;font-size:14px;color:var(--muted)}
 input[type=text],input[type=password],input[type=email],select,textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;background:#fff;margin-bottom:12px}
-button{background:var(--accent);color:white;padding:10px 14px;border-radius:6px;border:none;cursor:pointer}
+button{background:var(--accent);color:white;padding:10px 14px;border-radius:6px;border:none;cursor:pointer;min-height:44px;font-size:16px}
 button.secondary{background:#eef2ff;color:var(--accent)}
+
+@media (max-width:640px){
+  input[type=text],input[type=password],input[type=email],select,textarea{padding:12px;font-size:16px}
+  button{min-height:48px;padding:12px 16px;width:100%;margin-bottom:8px}
+  button.secondary{width:100%}
+}
 
 /* Tables */
 table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden}
 th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
 th{background:#fbfdff;font-weight:600;color:var(--muted)}
 
+@media (max-width:640px){
+  table{font-size:13px}
+  th,td{padding:6px 8px}
+  /* Enable horizontal scrolling for tables on mobile */
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+
 /* Alerts */
-.alert{padding:10px 12px;border-radius:6px;border:1px solid #dbeafe;background:#eff6ff;color:#1e3a8a}
+.alert{padding:10px 12px;border-radius:6px;border:1px solid #dbeafe;background:#eff6ff;color:#1e3a8a;font-size:14px}
+
+@media (max-width:640px){
+  .alert{padding:8px 10px;font-size:13px}
+}
 
 /* Utility */
 .text-muted{color:var(--muted)}
 .mb-2{margin-bottom:8px}
 .mb-4{margin-bottom:16px}
 
+/* Page layouts */
+.page-heading{margin-bottom:16px}
+.page-heading h1{margin:0;font-size:24px}
+.page-heading h2{margin:0;font-size:20px}
+
+@media (max-width:640px){
+  .page-heading{margin-bottom:12px}
+  .page-heading h1{font-size:20px}
+  .page-heading h2{font-size:18px}
+  .page-heading > div{flex-direction:column !important;align-items:flex-start !important;gap:8px}
+  .page-heading .button{width:100%;text-align:center;display:block;margin-bottom:8px}
+  .page-heading .button.secondary{margin-bottom:0}
+}
+
 /* Responsive */
 @media (max-width:800px){
   .app-layout{flex-direction:column;padding:0 12px}
   .app-sidebar{width:100%;flex:0 0 auto}
+}
+
+@media (max-width:640px){
+  body{font-size:14px}
+  .app-header{padding:12px 16px}
+  .brand-title{font-size:16px}
+  .app-layout{padding:0 8px;gap:12px;margin:12px auto}
+  .dashboard{padding:0 8px;margin:12px auto}
+  
+  input[type=text],input[type=password],input[type=email],select,textarea{padding:8px;font-size:16px;margin-bottom:10px}
+  button{padding:8px 12px;font-size:14px}
+  
+  table{font-size:13px}
+  th,td{padding:6px 8px}
+  
+  .form-card{margin:20px auto;padding:16px}
+  .form-card h2{font-size:16px}
+  .form-card label{font-size:12px}
+  
+  .card{padding:12px}
 }
 
 /* Mobile sidebar (slide-in) and overlays */
@@ -106,6 +192,21 @@ th{background:#fbfdff;font-weight:600;color:var(--muted)}
   .grid-2{grid-template-columns:1fr}
 }
 
+@media (max-width:640px){
+  .dashboard{padding:0 8px;margin:12px auto}
+  .dashboard-header{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:16px}
+  .dashboard-title{font-size:18px}
+  .dashboard-actions{width:100%}
+  .dashboard-actions .button{width:100%;padding:10px;font-size:14px}
+  .stats-grid{grid-template-columns:1fr;gap:10px}
+  .stat-card{padding:12px;border-radius:8px}
+  .stat-label{font-size:12px}
+  .stat-value{font-size:16px}
+  .grid-2{grid-template-columns:1fr;gap:12px}
+  .chart-placeholder{height:120px}
+  .staff-table th,.staff-table td{padding:6px 4px;font-size:12px}
+}
+
 /* Compact form styles and utilities */
 .form-wrapper{max-width:1000px;margin:60px auto;padding:0 16px}
 .form-card{max-width:520px;margin:40px auto;padding:20px;border-radius:10px}
@@ -115,9 +216,843 @@ th{background:#fbfdff;font-weight:600;color:var(--muted)}
 .form-small{max-width:420px}
 .inline-form{display:inline-block}
 
+@media (max-width:640px){
+  .form-wrapper{margin:20px auto;padding:0 12px}
+  .form-card{margin:20px auto;padding:16px}
+  .form-card h2{font-size:16px}
+  .form-card label{font-size:12px}
+  .form-card .form-actions{flex-direction:column;gap:0}
+  .form-card .form-actions button{margin-bottom:8px;width:100%}
+  .form-card .form-actions a{width:100%;text-align:center}
+  .form-small{max-width:100%}
+}
+
 /* Reduce default form control sizes for compact look */
 input[type=text],input[type=password],input[type=email],input[type=number],select,textarea{font-size:14px}
 
 /* Center login specifically with extra vertical spacing */
 .login-center{margin-top:80px;margin-bottom:80px}
+
+@media (max-width:640px){
+  input[type=text],input[type=password],input[type=email],input[type=number],select,textarea{font-size:16px}
+  .login-center{margin-top:20px;margin-bottom:20px}
+}
+
+/* Added styles for sales table rows based on order status */
+tr.completed {
+  background-color: #e6f7e6; /* Light green */
+}
+
+tr.cancelled {
+  background-color: #fce8e8; /* Light red */
+}
+
+tr.pending {
+  background-color: #f9f9f9; /* Default light gray */
+}
+
+/* Sales page specific styles */
+.sales-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-link {
+  padding: 12px 20px;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--muted);
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tab-link.active {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tab-link:hover {
+  color: var(--accent);
+}
+
+.sales-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .sales-tabs {
+    gap: 0;
+  }
+
+  .tab-link {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .sales-summary {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .sales-tabs {
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  .tab-link {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .sales-summary {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 10px !important;
+  }
+}
+
+/* ============================================
+   COMPREHENSIVE MOBILE OPTIMIZATION
+   ========================================== */
+
+/* Mobile-First: Touch targets and spacing */
+@media (max-width: 768px) {
+  /* Ensure all interactive elements are 44px minimum for touch */
+  button, a.button, input[type=checkbox], input[type=radio] {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Better spacing for smaller screens */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Improve form accessibility on mobile */
+  input[type=text],
+  input[type=password],
+  input[type=email],
+  input[type=number],
+  input[type=date],
+  input[type=time],
+  select,
+  textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  /* Button optimization */
+  button, 
+  a.button {
+    padding: 12px 16px;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+
+  button:active,
+  a.button:active {
+    opacity: 0.8;
+  }
+
+  /* Form groups */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  /* Two-column buttons on mobile */
+  .button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .button-group button,
+  .button-group a.button {
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+
+/* ============================================
+   RESPONSIVE TABLE OPTIMIZATION
+   ========================================== */
+
+@media (max-width: 768px) {
+  /* Scrollable tables */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 6px;
+  }
+
+  table tbody {
+    display: block;
+  }
+
+  table thead {
+    display: block;
+    background: #fbfdff;
+    border-bottom: 2px solid var(--border);
+  }
+
+  table tr {
+    display: block;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  table th,
+  table td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  table th {
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  /* Make numbers right-aligned and visible */
+  table td[style*="text-align: right"],
+  table th[style*="text-align: right"] {
+    text-align: right;
+  }
+
+  table td[style*="text-align: center"],
+  table th[style*="text-align: center"] {
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  table {
+    font-size: 12px;
+  }
+
+  table th,
+  table td {
+    padding: 6px 8px;
+  }
+
+  table thead {
+    font-size: 11px;
+  }
+
+  /* Stack table on very small screens */
+  table {
+    min-width: 300px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE GRID LAYOUTS
+   ========================================== */
+
+@media (max-width: 1024px) {
+  /* Three column to two column */
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Multi-column to single column */
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+
+  .sales-summary {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+
+  .sales-summary {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+
+  .button-group {
+    grid-template-columns: 1fr !important;
+  }
+
+  .button-group button,
+  .button-group a.button {
+    margin-bottom: 8px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE CARDS & CONTAINERS
+   ========================================== */
+
+@media (max-width: 768px) {
+  .card {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .stat-card {
+    padding: 12px !important;
+    border-radius: 8px;
+  }
+
+  .stat-card .stat-label {
+    font-size: 11px;
+  }
+
+  .stat-card .stat-value {
+    font-size: 16px;
+  }
+
+  /* Section spacing */
+  section {
+    margin-bottom: 16px;
+  }
+
+  section h2,
+  section h3 {
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 10px;
+  }
+
+  .stat-card {
+    padding: 10px !important;
+  }
+
+  .stat-card .stat-label {
+    font-size: 10px;
+  }
+
+  .stat-card .stat-value {
+    font-size: 14px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE NAVIGATION & ACTIONS
+   ========================================== */
+
+@media (max-width: 768px) {
+  .page-heading {
+    margin-bottom: 12px;
+  }
+
+  .page-heading h1 {
+    font-size: 20px;
+  }
+
+  .dashboard-actions,
+  .page-heading > div > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .dashboard-actions button,
+  .dashboard-actions a.button,
+  .page-heading a.button {
+    width: 100%;
+    text-align: center;
+    padding: 10px 12px;
+  }
+
+  .app-nav {
+    padding: 12px;
+  }
+
+  .app-nav li {
+    margin: 4px 0;
+  }
+
+  .app-nav a {
+    padding: 8px 8px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-heading h1 {
+    font-size: 18px;
+  }
+
+  .page-heading h2 {
+    font-size: 16px;
+  }
+
+  .app-nav h3 {
+    font-size: 13px;
+  }
+
+  .app-nav a {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE HEADER & LAYOUT
+   ========================================== */
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand-title {
+    font-size: 16px;
+  }
+
+  .page-title {
+    font-size: 13px;
+  }
+
+  .app-layout {
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 12px;
+    margin: 16px auto;
+  }
+
+  .app-sidebar {
+    width: 100%;
+  }
+
+  .app-main {
+    width: 100%;
+  }
+
+  .dashboard {
+    padding: 0 12px;
+    margin: 16px auto;
+  }
+
+  .form-wrapper {
+    padding: 0 12px;
+    margin: 16px auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px 12px;
+  }
+
+  .brand-title {
+    font-size: 14px;
+  }
+
+  .page-title {
+    font-size: 12px;
+  }
+
+  .app-layout {
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  body {
+    font-size: 13px;
+  }
+
+  main {
+    padding: 0 8px;
+  }
+
+  footer {
+    font-size: 11px;
+    padding: 8px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE FORM LAYOUTS
+   ========================================== */
+
+@media (max-width: 768px) {
+  .form-card {
+    margin: 20px auto;
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .form-card h2 {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .form-card label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .form-card input,
+  .form-card select,
+  .form-card textarea {
+    font-size: 16px;
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .form-actions button,
+  .form-actions a {
+    width: 100%;
+  }
+
+  /* Multi-column form to single column */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    margin-bottom: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-card {
+    margin: 16px auto;
+    padding: 12px;
+  }
+
+  .form-card h2 {
+    font-size: 15px;
+  }
+
+  .form-card label {
+    font-size: 12px;
+  }
+
+  .form-group label {
+    font-size: 12px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE MODAL/OVERLAY
+   ========================================== */
+
+@media (max-width: 768px) {
+  .modal,
+  .overlay {
+    padding: 12px;
+  }
+
+  .modal-content {
+    max-width: calc(100% - 24px);
+    margin: auto;
+    border-radius: 8px;
+  }
+
+  .modal-header {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .modal-body {
+    padding: 12px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-footer {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   RESPONSIVE TYPOGRAPHY
+   ========================================== */
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 20px;
+    margin: 16px 0 8px;
+  }
+
+  h2 {
+    font-size: 18px;
+    margin: 14px 0 8px;
+  }
+
+  h3 {
+    font-size: 16px;
+    margin: 12px 0 6px;
+  }
+
+  h4 {
+    font-size: 14px;
+    margin: 10px 0 4px;
+  }
+
+  p {
+    margin: 8px 0;
+  }
+
+  small {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 18px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+
+  h4 {
+    font-size: 13px;
+  }
+
+  small {
+    font-size: 10px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE ALERTS & NOTIFICATIONS
+   ========================================== */
+
+@media (max-width: 768px) {
+  .alert {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  .alert ul {
+    margin: 8px 0;
+    padding-left: 20px;
+  }
+
+  .alert li {
+    margin: 4px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .alert {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
+/* ============================================
+   UTILITY: MOBILE HIDDEN/SHOWN
+   ========================================== */
+
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .hide-mobile {
+    display: inherit;
+  }
+
+  .show-mobile {
+    display: none;
+  }
+}
+
+/* ============================================
+   RESPONSIVE IMAGES & MEDIA
+   ========================================== */
+
+@media (max-width: 768px) {
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  iframe {
+    max-width: 100%;
+  }
+}
+
+/* ============================================
+   RESPONSIVE ICONS
+   ========================================== */
+
+@media (max-width: 768px) {
+  .icon {
+    font-size: 14px;
+  }
+
+  .icon-sm {
+    font-size: 12px;
+  }
+
+  .icon-lg {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .icon {
+    font-size: 13px;
+  }
+
+  .icon-sm {
+    font-size: 11px;
+  }
+
+  .icon-lg {
+    font-size: 18px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE LISTS & DETAILS
+   ========================================== */
+
+@media (max-width: 768px) {
+  ul, ol {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+
+  li {
+    margin: 4px 0;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  dt {
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  dd {
+    margin: 4px 0 0;
+  }
+}
+
+/* ============================================
+   TOUCH-FRIENDLY SPACING & PADDING
+   ========================================== */
+
+@media (max-width: 768px) {
+  /* Increase spacing between interactive elements */
+  .button + .button,
+  button + button,
+  input + input {
+    margin-top: 8px;
+  }
+
+  /* Better spacing for list items */
+  li {
+    padding: 6px 0;
+  }
+
+  /* Link hover improvements */
+  a {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* ============================================
+   PRODUCTION PAGE MOBILE OPTIMIZATION
+   ========================================== */
+
+@media (max-width: 768px) {
+  .production-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .production-form {
+    display: grid;
+    gap: 12px;
+  }
+
+  .production-form input,
+  .production-form label {
+    width: 100%;
+  }
+}
 

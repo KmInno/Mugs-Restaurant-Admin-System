@@ -1,0 +1,573 @@
+<div class="summary-page">
+  <header class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title"><i class="fa fa-chart-pie icon"></i>Business Summary</h1>
+      <p class="text-muted">Complete overview of sales, expenses, production & staff performance</p>
+    </div>
+    <div class="dashboard-actions">
+      <span class="badge badge-primary">Week: <%= weekStartDate %> to <%= weekEndDate %></span>
+    </div>
+  </header>
+
+  <!-- Daily Metrics Section -->
+  <section class="metrics-section">
+    <h2 class="section-title"><i class="fa fa-calendar-day icon"></i>Today's Metrics</h2>
+    <div class="stats-grid">
+      <div class="stat-card stat-card-primary">
+        <div class="stat-label"><i class="fa fa-money-bill icon-sm"></i>Daily Sales (Before Expenses)</div>
+        <div class="stat-value"><%= dailyMetrics.salesBeforeExpenses || 0 %> UGX</div>
+        <div class="stat-subtitle">Gross sales</div>
+      </div>
+      <div class="stat-card stat-card-warning">
+        <div class="stat-label"><i class="fa fa-receipt icon-sm"></i>Daily Expenses</div>
+        <div class="stat-value"><%= dailyMetrics.totalExpenses || 0 %> UGX</div>
+        <div class="stat-subtitle">Total deductions</div>
+      </div>
+      <div class="stat-card stat-card-success">
+        <div class="stat-label"><i class="fa fa-chart-line icon-sm"></i>Daily Profit</div>
+        <div class="stat-value"><%= dailyMetrics.profitAfterExpenses || 0 %> UGX</div>
+        <div class="stat-subtitle">After expenses</div>
+      </div>
+      <div class="stat-card stat-card-info">
+        <div class="stat-label"><i class="fa fa-industry icon-sm"></i>Today's Production</div>
+        <div class="stat-value"><%= dailyMetrics.totalProduction || 0 %> Units</div>
+        <div class="stat-subtitle">Items produced</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weekly Summary Section -->
+  <section class="metrics-section">
+    <h2 class="section-title"><i class="fa fa-calendar-week icon"></i>Weekly Summary</h2>
+    <div class="stats-grid">
+      <div class="stat-card stat-card-primary">
+        <div class="stat-label"><i class="fa fa-money-bill-wave icon-sm"></i>Weekly Sales</div>
+        <div class="stat-value"><%= weeklySalesTotal || 0 %> UGX</div>
+        <div class="stat-subtitle">Total revenue</div>
+      </div>
+      <div class="stat-card stat-card-warning">
+        <div class="stat-label"><i class="fa fa-minus-circle icon-sm"></i>Weekly Expenses</div>
+        <div class="stat-value"><%= weeklyExpenseTotal || 0 %> UGX</div>
+        <div class="stat-subtitle">All deductions</div>
+      </div>
+      <div class="stat-card stat-card-success">
+        <div class="stat-label"><i class="fa fa-check-circle icon-sm"></i>Weekly Profit</div>
+        <div class="stat-value"><%= weeklyProfit || 0 %> UGX</div>
+        <div class="stat-subtitle">Net earnings</div>
+      </div>
+      <div class="stat-card stat-card-secondary">
+        <div class="stat-label"><i class="fa fa-percent icon-sm"></i>Margin</div>
+        <div class="stat-value">
+          <% const margin = weeklySalesTotal > 0 ? ((weeklyProfit / weeklySalesTotal) * 100).toFixed(2) : 0; %>
+          <%= margin %>%
+        </div>
+        <div class="stat-subtitle">Profit margin</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Staff Weekly Performance Section -->
+  <section class="metrics-section">
+    <h2 class="section-title"><i class="fa fa-users icon"></i>Staff Weekly Performance</h2>
+    <% if (staffWeekly && staffWeekly.length > 0) { %>
+      <div class="table-wrapper">
+        <table class="performance-table">
+          <thead>
+            <tr>
+              <th>Staff Member</th>
+              <th>Sales Count</th>
+              <th>Total Sales</th>
+              <th>Avg Sale</th>
+              <th>Performance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% staffWeekly.forEach((staff, index) => { %>
+              <% const topPerformer = staffWeekly[0]; %>
+              <% const perfPercentage = topPerformer.total_sales > 0 ? ((staff.total_sales / topPerformer.total_sales) * 100) : 0; %>
+              <tr class="<%= index === 0 ? 'top-performer' : '' %>">
+                <td class="staff-name">
+                  <span class="<%= index === 0 ? 'badge badge-success' : '' %>">
+                    <%= index + 1 %>. <%= staff.name %>
+                  </span>
+                </td>
+                <td class="text-center"><%= staff.sales_count || 0 %></td>
+                <td class="text-bold"><%= parseFloat(staff.total_sales).toFixed(2) %> UGX</td>
+                <td><%= parseFloat(staff.avg_sale).toFixed(2) %> UGX</td>
+                <td>
+                  <div class="progress">
+                    <div class="progress-bar" style="width:<%= perfPercentage %>%"></div>
+                  </div>
+                  <div class="text-muted" style="font-size:12px;margin-top:4px"><%= perfPercentage.toFixed(0) %>%</div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No staff performance data available for this week.</p>
+    <% } %>
+  </section>
+
+  <!-- Sales Trend Section -->
+  <% if (salesTrend && salesTrend.length > 0) { %>
+    <section class="metrics-section">
+      <h2 class="section-title"><i class="fa fa-chart-bar icon"></i>Daily Sales Trend</h2>
+      <div class="table-wrapper">
+        <table class="trend-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Daily Total</th>
+              <th>Transactions</th>
+              <th>Avg Transaction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% salesTrend.forEach(day => { %>
+              <% const avgTrans = day.transaction_count > 0 ? (day.daily_total / day.transaction_count) : 0; %>
+              <tr>
+                <td><strong><%= day.date %></strong></td>
+                <td><%= parseFloat(day.daily_total).toFixed(2) %> UGX</td>
+                <td class="text-center"><%= day.transaction_count %></td>
+                <td><%= parseFloat(avgTrans).toFixed(2) %> UGX</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Production Breakdown Section -->
+  <% if (productionBreakdown && productionBreakdown.length > 0) { %>
+    <section class="metrics-section">
+      <h2 class="section-title"><i class="fa fa-industry icon"></i>Production Breakdown</h2>
+      <div class="table-wrapper">
+        <table class="production-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Total Quantity</th>
+              <th>Entries</th>
+              <th>Avg per Entry</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% productionBreakdown.forEach(item => { %>
+              <% const avgPerEntry = item.entries > 0 ? (item.total_quantity / item.entries)  : 0; %>
+              <tr>
+                <td><strong><%= item.item %></strong></td>
+                <td class="text-bold"><%= item.total_quantity %> Units</td>
+                <td class="text-center"><%= item.entries %></td>
+                <td><%= parseFloat(avgPerEntry).toFixed(2) %> Units</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Expense Breakdown Section -->
+  <% if (expenseBreakdown && expenseBreakdown.length > 0) { %>
+    <section class="metrics-section">
+      <h2 class="section-title"><i class="fa fa-receipt icon"></i>Expense Breakdown</h2>
+      <div class="table-wrapper">
+        <table class="expense-table">
+          <thead>
+            <tr>
+              <th>Expense Category</th>
+              <th>Total Amount</th>
+              <th>Count</th>
+              <th>Percentage of Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% expenseBreakdown.forEach(expense => { %>
+              <% const expPct = weeklyExpenseTotal > 0 ? ((expense.total / weeklyExpenseTotal) * 100) : 0; %>
+              <tr>
+                <td><strong><%= expense.description || 'Uncategorized' %></strong></td>
+                <td class="text-bold"><%= parseFloat(expense.total).toFixed(2) %> UGX</td>
+                <td class="text-center"><%= expense.count %></td>
+                <td>
+                  <div class="progress-small">
+                    <div class="progress-bar" style="width:<%= expPct %>%"></div>
+                  </div>
+                  <span class="text-muted" style="font-size:11px"><%= expPct.toFixed(1) %>%</span>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% } %>
+
+</div>
+
+<style>
+.summary-page {
+  padding: 0;
+}
+
+.metrics-section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title .icon {
+  color: #007bff;
+  font-size: 1.3rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 5px solid #ccc;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-primary {
+  border-left-color: #007bff;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f1ff 100%);
+}
+
+.stat-card-success {
+  border-left-color: #28a745;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5f0 100%);
+}
+
+.stat-card-warning {
+  border-left-color: #ffc107;
+  background: linear-gradient(135deg, #f8f9fa 0%, #fff8e8 100%);
+}
+
+.stat-card-info {
+  border-left-color: #17a2b8;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5f8 100%);
+}
+
+.stat-card-secondary {
+  border-left-color: #6c757d;
+  background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f2 100%);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.icon-sm {
+  font-size: 1rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.stat-subtitle {
+  font-size: 0.85rem;
+  color: #999;
+  font-style: italic;
+}
+
+.table-wrapper {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.performance-table,
+.trend-table,
+.production-table,
+.expense-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.performance-table th,
+.trend-table th,
+.production-table th,
+.expense-table th {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.performance-table td,
+.trend-table td,
+.production-table td,
+.expense-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+}
+
+.performance-table tbody tr:last-child td,
+.trend-table tbody tr:last-child td,
+.production-table tbody tr:last-child td,
+.expense-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.performance-table tbody tr:hover,
+.trend-table tbody tr:hover,
+.production-table tbody tr:hover,
+.expense-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.performance-table tr.top-performer {
+  background-color: #e8f5e9;
+  font-weight: 600;
+}
+
+.staff-name {
+  font-weight: 500;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-bold {
+  font-weight: 700;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.badge-primary {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.progress {
+  height: 6px;
+  background-color: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-small {
+  height: 4px;
+  background-color: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.progress-small .progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffc107, #ff9800);
+}
+
+@media (max-width: 768px) {
+  .metrics-section {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    gap: 0.3rem;
+  }
+
+  .stat-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .table-wrapper {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .performance-table th,
+  .trend-table th,
+  .production-table th,
+  .expense-table th {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .performance-table td,
+  .trend-table td,
+  .production-table td,
+  .expense-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .badge {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .progress {
+    height: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-page {
+    padding: 0;
+  }
+
+  .metrics-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    gap: 0.3rem;
+  }
+
+  .section-title .icon {
+    font-size: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .stat-card {
+    padding: 0.85rem;
+    border-radius: 6px;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .stat-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .table-wrapper {
+    padding: 0.85rem;
+    border-radius: 6px;
+  }
+
+  .performance-table th,
+  .trend-table th,
+  .production-table th,
+  .expense-table th {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .performance-table td,
+  .trend-table td,
+  .production-table td,
+  .expense-table td {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .staff-name {
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .badge {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.7rem;
+  }
+
+  .text-center {
+    font-size: 0.8rem;
+  }
+
+  .progress {
+    height: 3px;
+    margin: 3px 0;
+  }
+
+  .text-muted {
+    font-size: 0.7rem;
+  }
+}
+</style>

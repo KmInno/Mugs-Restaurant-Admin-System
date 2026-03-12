@@ -1,0 +1,214 @@
+<div class="staff-details-page">
+  <header class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title"><i class="fa fa-user-circle icon"></i>Staff Sales Details</h1>
+      <p class="text-muted">Payment tracking for individual staff member</p>
+    </div>
+    <div class="dashboard-actions">
+      <a href="/clearance?date=<%= selectedDate %>" class="button secondary"><i class="fa fa-arrow-left"></i>Back to Clearance</a>
+    </div>
+  </header>
+
+  <!-- Staff Summary -->
+  <div class="staff-info-card" style="background:linear-gradient(135deg, #f8f9fa 0%, #fbfdff 100%);border:1px solid #e6edf3;padding:20px;border-radius:8px;margin-bottom:20px">
+    <h2 style="margin:0 0 16px 0;font-size:20px"><i class="fa fa-user" style="color:#2563eb;margin-right:8px"></i>Staff Member: <strong><%= staffSales[0]?.staff_name || 'Unknown' %></strong></h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:16px">
+      <div>
+        <div style="font-size:12px;color:#6b7280;margin-bottom:4px;font-weight:500">Total Orders</div>
+        <div style="font-size:24px;font-weight:700;color:#0f172a"><%= staffSales.length %></div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:#6b7280;margin-bottom:4px;font-weight:500">Total Sales</div>
+        <div style="font-size:24px;font-weight:700;color:#0f172a"><%= totalSales.toFixed(2) %> UGX</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:#28a745;margin-bottom:4px;font-weight:500"><i class="fa fa-check-circle"></i> Paid</div>
+        <div style="font-size:24px;font-weight:700;color:#28a745"><%= paidTotal.toFixed(2) %> UGX</div>
+        <div style="font-size:11px;color:#6b7280">(<%= paidSales.length %> orders)</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:#ffc107;margin-bottom:4px;font-weight:500"><i class="fa fa-exclamation-circle"></i> Unpaid</div>
+        <div style="font-size:24px;font-weight:700;color:#ffc107"><%= unpaidTotal.toFixed(2) %> UGX</div>
+        <div style="font-size:11px;color:#6b7280">(<%= unpaidSales.length %> orders)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paid Orders -->
+  <% if (paidSales && paidSales.length > 0) { %>
+    <section style="margin-bottom:24px">
+      <h3 style="margin-bottom:12px;font-size:16px;font-weight:600"><i class="fa fa-check-circle" style="color:#28a745;margin-right:8px"></i>Paid Orders (<%= paidSales.length %>)</h3>
+      <div style="background:white;border-radius:8px;border:1px solid #e6edf3;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">ID</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Amount</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Room</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Order Details</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Time</th>
+              <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% paidSales.forEach(s => { %>
+              <tr style="border-bottom:1px solid #e6edf3;background:#e8f5e9">
+                <td style="padding:12px 16px;font-size:13px"><strong>#<%= s.id %></strong></td>
+                <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#28a745"><%= s.amount %> UGX</td>
+                <td style="padding:12px 16px;font-size:13px"><%= s.room_number %></td>
+                <td style="padding:12px 16px;font-size:13px"><%= s.order_details %></td>
+                <td style="padding:12px 16px;font-size:13px"><%= new Date(s.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></td>
+                <td style="padding:12px 16px;text-align:center">
+                  <button onclick="updatePaymentStatus(<%= s.id %>, 'unpaid', this)" class="button secondary" style="padding:6px 12px;font-size:12px">Mark Unpaid</button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Unpaid Orders -->
+  <% if (unpaidSales && unpaidSales.length > 0) { %>
+    <section style="margin-bottom:24px">
+      <h3 style="margin-bottom:12px;font-size:16px;font-weight:600"><i class="fa fa-exclamation-circle" style="color:#ffc107;margin-right:8px"></i>Unpaid Orders (<%= unpaidSales.length %>)</h3>
+      <div style="background:white;border-radius:8px;border:1px solid #e6edf3;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">ID</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Amount</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Room</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Order Details</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Time</th>
+              <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% unpaidSales.forEach(s => { %>
+              <tr style="border-bottom:1px solid #e6edf3;background:#fef0e8">
+                <td style="padding:12px 16px;font-size:13px"><strong>#<%= s.id %></strong></td>
+                <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#ffc107"><%= s.amount %> UGX</td>
+                <td style="padding:12px 16px;font-size:13px"><%= s.room_number %></td>
+                <td style="padding:12px 16px;font-size:13px"><%= s.order_details %></td>
+                <td style="padding:12px 16px;font-size:13px"><%= new Date(s.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></td>
+                <td style="padding:12px 16px;text-align:center">
+                  <button onclick="updatePaymentStatus(<%= s.id %>, 'paid', this)" class="button" style="padding:6px 12px;font-size:12px;background:#28a745">Mark Paid</button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% } %>
+
+  <% if (!staffSales || staffSales.length === 0) { %>
+    <div style="background:white;border-radius:8px;border:1px solid #e6edf3;padding:40px;text-align:center;color:#6b7280">
+      <i class="fa fa-inbox" style="font-size:32px;margin-bottom:12px;display:block;color:#9ca3af"></i>
+      <p>No sales for this staff member on <%= selectedDate %></p>
+    </div>
+  <% } %>
+
+  <div style="margin-top:20px;text-align:center">
+    <a href="/clearance?date=<%= selectedDate %>" class="button secondary">Back to Clearance</a>
+  </div>
+</div>
+
+<script>
+async function updatePaymentStatus(saleId, status, button) {
+  const originalText = button.innerText;
+  button.disabled = true;
+  button.innerText = 'Updating...';
+
+  try {
+    const response = await fetch('/clearance/payment/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        saleId: saleId,
+        paymentStatus: status
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Reload the page to see changes
+      location.reload();
+    } else {
+      alert('Error: ' + (result.message || 'Failed to update payment status'));
+      button.disabled = false;
+      button.innerText = originalText;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to update payment status');
+    button.disabled = false;
+    button.innerText = originalText;
+  }
+}
+</script>
+
+<style>
+.staff-details-page {
+  padding: 0;
+}
+
+.staff-info-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #fbfdff 100%);
+  border: 1px solid #e6edf3;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .staff-info-card {
+    padding: 16px;
+  }
+
+  .staff-info-card h2 {
+    font-size: 18px;
+  }
+
+  table th,
+  table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .staff-info-card {
+    padding: 12px;
+  }
+
+  .staff-info-card h2 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .staff-info-card > div {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  table {
+    font-size: 11px;
+  }
+
+  table th,
+  table td {
+    padding: 8px 6px;
+  }
+
+  button {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+}
+</style>

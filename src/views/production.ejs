@@ -1,56 +1,155 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Production - Stock Count</title>
-</head>
-<body>
-  <h1>Production / Daily Counts</h1>
-  <% if (messages && messages.error) { %>
-    <div style="color:red;"><%= messages.error.join(', ') %></div>
-  <% } %>
-  <% if (messages && messages.success) { %>
-    <div style="color:green;"><%= messages.success.join(', ') %></div>
-  <% } %>
+<%- contentFor('body') %>
 
-  <form method="POST" action="/production">
-    <div>
-      <label>Item: <input name="item" type="text" required></label>
+<div class="page-heading">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <h1>Production / Daily Counts</h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <!-- Add action buttons if needed -->
     </div>
+  </div>
+</div>
+
+<!-- Messages -->
+<% if (messages && (messages.error || messages.success)) { %>
+  <div style="margin-bottom:20px">
+    <% if (messages.error) { %>
+      <% messages.error.forEach(msg => { %>
+        <div style="background:#fee;border:1px solid #fcc;color:#c00;padding:12px;border-radius:8px;margin-bottom:8px">
+          <i class="fa fa-exclamation-circle"></i> <%= msg %>
+        </div>
+      <% }) %>
+    <% } %>
+    <% if (messages.success) { %>
+      <% messages.success.forEach(msg => { %>
+        <div style="background:#efe;border:1px solid #cfc;color:#060;padding:12px;border-radius:8px;margin-bottom:8px">
+          <i class="fa fa-check-circle"></i> <%= msg %>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+<% } %>
+
+<!-- Add Production Entry Form -->
+<section style="background:white;border:1px solid #e6edf3;border-radius:8px;padding:20px;margin-bottom:24px">
+  <h2 style="margin-bottom:16px;font-size:16px;font-weight:600"><i class="fa fa-plus-circle" style="margin-right:8px"></i>Add Production Entry</h2>
+  <form method="POST" action="/production" style="display:grid;gap:12px;max-width:500px">
     <div>
-      <label>Quantity: <input name="quantity" type="number" min="0" required></label>
+      <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151">Item Name</label>
+      <input 
+        name="item" 
+        type="text" 
+        required 
+        style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px"
+        placeholder="e.g., Rice, Beans, Oil"
+      >
     </div>
+    
     <div>
-      <button type="submit">Add</button>
+      <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151">Quantity</label>
+      <input 
+        name="quantity" 
+        type="number" 
+        min="0" 
+        required 
+        style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px"
+        placeholder="e.g., 50"
+      >
     </div>
+
+    <div>
+      <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151">Unit Price (UGX)</label>
+      <input 
+        name="unit_price" 
+        type="number" 
+        min="0" 
+        step="0.01"
+        style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px"
+        placeholder="e.g., 500.50"
+      >
+    </div>
+
+    <button 
+      type="submit" 
+      style="background:#2563eb;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;width:100%"
+    >
+      <i class="fa fa-plus"></i> Add Entry
+    </button>
   </form>
+</section>
 
-  <h2>Today's Total Produced: <%= typeof total !== 'undefined' ? total : 0 %></h2>
+<!-- Summary Stats -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:24px">
+  <div style="background:white;border-left:4px solid #2563eb;padding:16px;border-radius:8px;border:1px solid #e6edf3">
+    <div style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-box" style="margin-right:4px"></i>Total Quantity</div>
+    <div style="font-size:20px;font-weight:700;color:#0f172a"><%= typeof total !== 'undefined' ? total : 0 %> units</div>
+  </div>
 
-  <% if (entries && entries.length) { %>
-    <table border="1" cellpadding="6">
+  <div style="background:white;border-left:4px solid #28a745;padding:16px;border-radius:8px;border:1px solid #e6edf3">
+    <div style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-tags" style="margin-right:4px"></i>Total Value</div>
+    <div style="font-size:20px;font-weight:700;color:#0f172a"><%= typeof totalValue !== 'undefined' ? parseFloat(totalValue).toFixed(2) : 0 %> UGX</div>
+  </div>
+</div>
+
+<!-- Production Entries Table -->
+<section style="background:white;border-radius:8px;border:1px solid #e6edf3;overflow-x:auto">
+  <% if (entries && entries.length > 0) { %>
+    <table style="width:100%;border-collapse:collapse">
       <thead>
-        <tr>
-          <th>ID</th>
-          <th>Item</th>
-          <th>Quantity</th>
-          <th>Created At</th>
+        <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
+          <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">ID</th>
+          <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Item</th>
+          <th style="padding:12px 16px;text-align:right;font-weight:600;color:#6b7280;font-size:13px">Quantity</th>
+          <th style="padding:12px 16px;text-align:right;font-weight:600;color:#6b7280;font-size:13px">Unit Price</th>
+          <th style="padding:12px 16px;text-align:right;font-weight:600;color:#6b7280;font-size:13px">Total Price</th>
+          <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Created At</th>
         </tr>
       </thead>
       <tbody>
         <% entries.forEach(e => { %>
-          <tr>
-            <td><%= e.id %></td>
-            <td><%= e.item %></td>
-            <td><%= e.quantity %></td>
-            <td><%= e.created_at %></td>
+          <% const totalPrice = (e.quantity * parseFloat(e.unit_price || 0)).toFixed(2); %>
+          <tr style="border-bottom:1px solid #e6edf3;background:#f9f9f9">
+            <td style="padding:12px 16px;font-size:13px"><strong>#<%= e.id %></strong></td>
+            <td style="padding:12px 16px;font-size:13px"><strong><%= e.item %></strong></td>
+            <td style="padding:12px 16px;text-align:right;font-size:13px"><%= e.quantity %> units</td>
+            <td style="padding:12px 16px;text-align:right;font-size:13px"><%= parseFloat(e.unit_price || 0).toFixed(2) %> UGX</td>
+            <td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:600;color:#2563eb"><%= totalPrice %> UGX</td>
+            <td style="padding:12px 16px;font-size:13px;color:#6b7280"><%= new Date(e.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></td>
           </tr>
         <% }) %>
       </tbody>
     </table>
   <% } else { %>
-    <p>No entries for today.</p>
+    <div style="padding:40px;text-align:center;color:#9ca3af">
+      <i class="fa fa-inbox" style="font-size:24px;display:block;margin-bottom:12px"></i>
+      <p>No production entries for today.</p>
+    </div>
   <% } %>
+</section>
 
-  <p><a href="/dashboard">Back to Dashboard</a></p>
-</body>
-</html>
+<style>
+  @media (max-width: 768px) {
+    table {
+      font-size: 12px;
+    }
+    
+    table th,
+    table td {
+      padding: 10px 12px;
+    }
+
+    .page-heading h1 {
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    table {
+      font-size: 11px;
+    }
+    
+    table th,
+    table td {
+      padding: 8px 6px;
+    }
+  }
+</style>

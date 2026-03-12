@@ -13,6 +13,7 @@ const saleRoutes = require('./routes/saleRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const baseRoutes = require('./routes/baseRoute');
 const settingsRoutes = require('./routes/settingsRoutes');
+const staffClearanceRoutes = require('./routes/staffClearanceRoutes');
 
 const app = express();
 
@@ -69,6 +70,9 @@ app.use('/', baseRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/sales', saleRoutes);
 app.use('/api/expenses', expenseRoutes);
+
+// Staff clearance routes
+app.use('/', staffClearanceRoutes);
 
 // Mount web auth routes at root so /account/* is available
 app.use('/', authRoutes);

@@ -1,61 +1,246 @@
+<%- contentFor('body') %>
+
 <div class="dashboard">
   <header class="dashboard-header">
     <div>
-      <h1 class="dashboard-title"><i class="fa fa-user icon"></i>Welcome, <%= userName %>!</h1>
-      <p class="text-muted">Quick snapshot of today's activity</p>
+      <h1 class="dashboard-title"><i class="fa fa-chart-line icon"></i>Dashboard</h1>
+      <p class="text-muted">Welcome <strong><%= userName %></strong> - Today's Overview</p>
     </div>
     <div class="dashboard-actions">
-      <a class="button secondary" href="/production"><i class="fa fa-industry" style="margin-right:8px"></i>Record Production</a>
+      <a class="button" href="/sales/add"><i class="fa fa-plus-circle"></i>Add Sale</a>
+      <a class="button secondary" href="/production"><i class="fa fa-industry"></i>Production</a>
     </div>
   </header>
 
-  <section class="stats-grid mb-4">
-    <div class="stat-card">
-      <div class="stat-label"><i class="fa fa-dollar-sign icon-sm"></i>Total Sales</div>
-      <div class="stat-value"><%= totalSales || 0 %> UGX</div>
+  <!-- Primary Stats Grid -->
+  <section class="stats-grid mb-4" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:24px">
+    <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #2563eb;padding:16px;border-radius:8px">
+      <div class="stat-label" style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-dollar-sign icon-sm" style="margin-right:4px"></i>Total Sales</div>
+      <div class="stat-value" style="font-size:24px;font-weight:700;color:#0f172a"><%= parseFloat(totalSales || 0).toFixed(2) %> UGX</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:8px"><%= (breakfastCount || 0) + (lunchCount || 0) %> transactions</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label"><i class="fa fa-user-friends icon-sm"></i>Total Debtors</div>
-      <div class="stat-value"><%= typeof totalDebtors !== 'undefined' ? totalDebtors : 0 %> UGX</div>
+
+    <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #ffc107;padding:16px;border-radius:8px">
+      <div class="stat-label" style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-file-invoice-dollar icon-sm" style="margin-right:4px"></i>Total Expenses</div>
+      <div class="stat-value" style="font-size:24px;font-weight:700;color:#0f172a"><%= parseFloat(totalExpenses || 0).toFixed(2) %> UGX</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:8px">Operating costs</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label"><i class="fa fa-file-invoice-dollar icon-sm"></i>Total Expenses</div>
-      <div class="stat-value"><%= totalExpenses || 0 %> UGX</div>
+
+    <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #17a2b8;padding:16px;border-radius:8px">
+      <div class="stat-label" style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-industry icon-sm" style="margin-right:4px"></i>Production</div>
+      <div class="stat-value" style="font-size:24px;font-weight:700;color:#0f172a"><%= totalProduction || 0 %> units</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:8px">Value: <%= parseFloat(totalProductionValue || 0).toFixed(2) %> UGX</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label"><i class="fa fa-chart-line icon-sm"></i>Estimated Profit</div>
-      <div class="stat-value"><%= profit || 0 %> UGX</div>
+
+    <div class="stat-card" style="background:linear-gradient(135deg, #fff 0%, #fbfdff 100%);border-left:4px solid #28a745;padding:16px;border-radius:8px">
+      <div class="stat-label" style="font-size:12px;color:#6b7280;margin-bottom:8px"><i class="fa fa-chart-line icon-sm" style="margin-right:4px"></i>Est. Profit</div>
+      <div class="stat-value" style="font-size:24px;font-weight:700;color:<%= profit >= 0 ? '#28a745' : '#dc3545' %>"><%= parseFloat(profit || 0).toFixed(2) %> UGX</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:8px">After expenses & production</div>
     </div>
   </section>
 
-  <section class="grid-2">
-    <div class="card">
-      <h3 class="mb-2"><i class="fa fa-chart-bar icon"></i>Sales Overview</h3>
-      <div class="chart-placeholder">(Chart placeholder) </div>
-      <p class="text-muted mb-0">Daily sales: <strong><%= totalSales || 0 %> UGX</strong></p>
+  <!-- Meal Period Classification -->
+  <section style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:12px;margin-bottom:24px">
+    <div style="background:white;border:1px solid #e6edf3;border-radius:8px;padding:16px">
+      <h3 style="margin-bottom:12px;font-size:14px;font-weight:600"><i class="fa fa-sunrise" style="color:#2563eb;margin-right:6px"></i>Breakfast (Before 12pm)</h3>
+      <div style="font-size:18px;font-weight:700;color:#2563eb"><%= parseFloat(breakfastTotal || 0).toFixed(2) %> UGX</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:6px"><%= breakfastCount || 0 %> orders</div>
     </div>
 
-    <div class="card">
-      <h3 class="mb-2"><i class="fa fa-users icon"></i>Staff Performance</h3>
-      <table class="staff-table">
-        <thead>
-          <tr><th>Staff</th><th>Sales</th><th>Share</th></tr>
-        </thead>
-        <tbody>
-          <% staff.forEach(s => { %>
-            <% const pct = (totalSales && totalSales > 0) ? Math.round((s.sales / totalSales) * 100) : 0; %>
-            <tr>
-              <td><%= s.name %></td>
-              <td><%= s.sales %> UGX</td>
-              <td style="width:160px">
-                <div class="progress"><div class="progress-bar" style="width:<%= pct %>%"></div></div>
-                <div class="text-muted" style="font-size:12px;margin-top:6px"><%= pct %>%</div>
-              </td>
+    <div style="background:white;border:1px solid #e6edf3;border-radius:8px;padding:16px">
+      <h3 style="margin-bottom:12px;font-size:14px;font-weight:600"><i class="fa fa-sun" style="color:#ffc107;margin-right:6px"></i>Lunch (12pm & Later)</h3>
+      <div style="font-size:18px;font-weight:700;color:#ffc107"><%= parseFloat(lunchTotal || 0).toFixed(2) %> UGX</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:6px"><%= lunchCount || 0 %> orders</div>
+    </div>
+  </section>
+
+  <!-- Payment Status & Staff Clearance -->
+  <section style="background:white;border:1px solid #e6edf3;border-radius:8px;padding:16px;margin-bottom:24px">
+    <h2 style="margin-bottom:12px;font-size:16px;font-weight:600"><i class="fa fa-handshake" style="margin-right:8px"></i>Staff Payment Status</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px">
+      <div style="background:#e8f5f0;border:1px solid #c3e4d8;padding:12px;border-radius:6px">
+        <div style="font-size:12px;color:#0b6e4f;font-weight:600;margin-bottom:6px"><i class="fa fa-check-circle"></i> Paid</div>
+        <div style="font-size:18px;font-weight:700;color:#0b6e4f"><%= parseFloat(paidTotal || 0).toFixed(2) %> UGX</div>
+      </div>
+      <div style="background:#fff3cd;border:1px solid #ffeaa7;padding:12px;border-radius:6px">
+        <div style="font-size:12px;color:#856404;font-weight:600;margin-bottom:6px"><i class="fa fa-exclamation-circle"></i> Unpaid</div>
+        <div style="font-size:18px;font-weight:700;color:#dc3545"><%= parseFloat(unpaidTotal || 0).toFixed(2) %> UGX</div>
+      </div>
+      <div style="background:#f0f4f8;border:1px solid #d1d5db;padding:12px;border-radius:6px">
+        <div style="font-size:12px;color:#4b5563;font-weight:600;margin-bottom:6px"><i class="fa fa-users"></i> Staff</div>
+        <div style="font-size:18px;font-weight:700;color:#374151"><%= staffClearanceCount || 0 %> members</div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <a href="/clearance" style="color:#2563eb;text-decoration:none;font-size:13px;font-weight:600">Go to Staff Clearance →</a>
+    </div>
+  </section>
+
+  <!-- Two Column Section: Staff Performance & Quick Summary -->
+  <section style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:12px;margin-bottom:24px">
+    <!-- Staff Performance -->
+    <div style="background:white;border:1px solid #e6edf3;border-radius:8px;padding:16px;overflow-x:auto">
+      <h3 style="margin-bottom:12px;font-size:14px;font-weight:600"><i class="fa fa-chart-bar" style="margin-right:6px"></i>Top Staff Performance</h3>
+      <% if (staff && staff.length > 0) { %>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="border-bottom:1px solid #e6edf3">
+              <th style="padding:8px 0;text-align:left;font-weight:600;color:#6b7280">Staff</th>
+              <th style="padding:8px 0;text-align:right;font-weight:600;color:#6b7280">Sales</th>
+              <th style="padding:8px 0;text-align:right;font-weight:600;color:#6b7280">Share</th>
             </tr>
-          <% }) %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% staff.forEach(s => { %>
+              <% const pct = (totalSales && totalSales > 0) ? Math.round((s.sales / totalSales) * 100) : 0; %>
+              <tr style="border-bottom:1px solid #f0f0f0">
+                <td style="padding:10px 0"><strong><%= s.name %></strong></td>
+                <td style="padding:10px 0;text-align:right"><%= parseFloat(s.sales).toFixed(2) %> UGX</td>
+                <td style="padding:10px 0;text-align:right">
+                  <span style="background:#2563eb;color:white;padding:2px 8px;border-radius:12px;font-weight:600"><%= pct %>%</span>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div style="text-align:center;color:#9ca3af;padding:20px">
+          <p>No staff sales recorded yet</p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Daily Summary -->
+    <div style="background:white;border:1px solid #e6edf3;border-radius:8px;padding:16px">
+      <h3 style="margin-bottom:12px;font-size:14px;font-weight:600"><i class="fa fa-info-circle" style="margin-right:6px"></i>Daily Summary</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+        <div style="background:#f9f9f9;padding:10px;border-radius:6px;display:flex;justify-content:space-between">
+          <span style="color:#6b7280">Total Transactions:</span>
+          <strong><%= (breakfastCount || 0) + (lunchCount || 0) %></strong>
+        </div>
+        <div style="background:#f9f9f9;padding:10px;border-radius:6px;display:flex;justify-content:space-between">
+          <span style="color:#6b7280">Breakfast Orders:</span>
+          <strong><%= breakfastCount || 0 %></strong>
+        </div>
+        <div style="background:#f9f9f9;padding:10px;border-radius:6px;display:flex;justify-content:space-between">
+          <span style="color:#6b7280">Lunch Orders:</span>
+          <strong><%= lunchCount || 0 %></strong>
+        </div>
+        <div style="background:#f9f9f9;padding:10px;border-radius:6px;display:flex;justify-content:space-between;border-top:2px solid #e6edf3;margin-top:6px;padding-top:10px">
+          <span style="color:#6b7280">Debtors:</span>
+          <strong style="color:#dc3545"><%= parseFloat(totalDebtors || 0).toFixed(2) %> UGX</strong>
+        </div>
+        <div style="background:f9f9f9;padding:10px;border-radius:6px;display:flex;justify-content:space-between">
+          <a href="/sales" style="color:#2563eb;text-decoration:none;font-weight:600">View All Sales →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section style="background:white;border:1px solid #e6edf3;border-radius:8px;padding:16px">
+    <h3 style="margin-bottom:12px;font-size:14px;font-weight:600"><i class="fa fa-lightning-bolt" style="margin-right:6px"></i>Quick Actions</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px">
+      <a href="/sales/add" class="button" style="text-align:center;padding:10px;display:inline-block;width:100%;text-decoration:none"><i class="fa fa-plus"></i> Add Sale</a>
+      <a href="/sales" class="button secondary" style="text-align:center;padding:10px;display:inline-block;width:100%;text-decoration:none"><i class="fa fa-shopping-cart"></i> View Sales</a>
+      <a href="/production" class="button secondary" style="text-align:center;padding:10px;display:inline-block;width:100%;text-decoration:none"><i class="fa fa-industry"></i> Production</a>
+      <a href="/clearance" class="button secondary" style="text-align:center;padding:10px;display:inline-block;width:100%;text-decoration:none"><i class="fa fa-handshake"></i> Staff Clearance</a>
+      <a href="/expenses" class="button secondary" style="text-align:center;padding:10px;display:inline-block;width:100%;text-decoration:none"><i class="fa fa-receipt"></i> Expenses</a>
+      <a href="/summary" class="button secondary" style="text-align:center;padding:10px;display:inline-block;width:100%;text-decoration:none"><i class="fa fa-chart-pie"></i> Summary</a>
     </div>
   </section>
 
 </div>
+
+<style>
+  .dashboard {
+    padding: 0;
+  }
+
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e6edf3;
+  }
+
+  .dashboard-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .text-muted {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 4px 0 0;
+  }
+
+  .dashboard-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .button {
+    background: #2563eb;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .button:hover {
+    background: #1d4ed8;
+  }
+
+  .button.secondary {
+    background: #6b7280;
+  }
+
+  .button.secondary:hover {
+    background: #4b5563;
+  }
+
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .dashboard-actions {
+      width: 100%;
+    }
+
+    .dashboard-actions .button {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    .dashboard-title {
+      font-size: 20px;
+    }
+  }
+</style>

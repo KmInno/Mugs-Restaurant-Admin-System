@@ -1,25 +1,37 @@
 const baseController = {};
 const salesModel = require('../models/salesModel');
 const expenseModel = require('../models/expenseModel');
+const productionModel = require('../models/productionModel');
 const logger = require('../utils/logger');
 
 baseController.buildDashboard = async function (req, res, next) {
     try {
         const today = new Date().toISOString().slice(0, 10);
 
-        const [totalSales, totalExpenses, staffRows, totalDebtors] = await Promise.all([
+        const [totalSales, totalExpenses, staffRows, totalDebtors, productionEntries, totalProduction, totalProductionValue, timeOfDayData, staffClearance] = await Promise.all([
             salesModel.getTotalSalesForDate(today),
             expenseModel.getTotalExpensesForDate(today),
             salesModel.getTopStaffSalesForDate(today, 5),
-            salesModel.getTotalDebtorsForDate(today)
+            salesModel.getTotalDebtorsForDate(today),
+            productionModel.getEntriesForDate(today),
+            productionModel.getTotalForDate(today),
+            productionModel.getTotalValueForDate(today),
+            salesModel.getSalesByTimeOfDay(today),
+            salesModel.getStaffClearanceForDate(today)
         ]);
 
-        const profit = parseFloat(totalSales) - parseFloat(totalExpenses);
+        const profit = parseFloat(totalSales) - parseFloat(totalExpenses) - parseFloat(totalProductionValue);
+        
+        const breakfastTotal = timeOfDayData.breakfast.reduce((sum, s) => sum + parseFloat(s.amount || 0), 0);
+        const lunchTotal = timeOfDayData.lunch.reduce((sum, s) => sum + parseFloat(s.amount || 0), 0);
+
+        // Calculate payment summary
+        const paidTotal = staffClearance.reduce((sum, s) => sum + parseFloat(s.paid_amount || 0), 0);
+        const unpaidTotal = staffClearance.reduce((sum, s) => sum + parseFloat(s.unpaid_amount || 0), 0);
 
         const staff = (staffRows || []).map(r => ({ name: r.name, sales: r.sales }));
 
         logger.info(`Dashboard data for ${today}: totalSales=${totalSales} totalExpenses=${totalExpenses} profit=${profit}`);
-        logger.info(`Top staff rows: ${JSON.stringify(staffRows)}`);
 
         const user = req.session && req.session.user ? req.session.user : null;
         // Render a simplified employee dashboard for non-admin users
@@ -40,7 +52,16 @@ baseController.buildDashboard = async function (req, res, next) {
             totalExpenses,
             totalDebtors,
             profit,
-            staff
+            staff,
+            totalProduction,
+            totalProductionValue,
+            breakfastTotal,
+            lunchTotal,
+            breakfastCount: timeOfDayData.breakfast.length,
+            lunchCount: timeOfDayData.lunch.length,
+            paidTotal,
+            unpaidTotal,
+            staffClearanceCount: staffClearance.length
         });
     } catch (err) {
         logger.error('Error building dashboard: ' + (err && err.message ? err.message : err));
@@ -59,7 +80,16 @@ baseController.buildDashboard = async function (req, res, next) {
             totalSales: 0,
             totalExpenses: 0,
             profit: 0,
-            staff: []
+            staff: [],
+            totalProduction: 0,
+            totalProductionValue: 0,
+            breakfastTotal: 0,
+            lunchTotal: 0,
+            breakfastCount: 0,
+            lunchCount: 0,
+            paidTotal: 0,
+            unpaidTotal: 0,
+            staffClearanceCount: 0
         });
     }
 }

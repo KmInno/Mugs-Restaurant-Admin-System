@@ -1,0 +1,130 @@
+<div class="unpaid-debts-page">
+  <header class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title"><i class="fa fa-exclamation-triangle icon"></i>Outstanding Debts</h1>
+      <p class="text-muted">Unpaid sales from previous days - staff payment tracking</p>
+    </div>
+    <div class="dashboard-actions">
+      <a href="/clearance" class="button secondary"><i class="fa fa-arrow-left"></i>Back to Clearance</a>
+    </div>
+  </header>
+
+  <!-- Summary by Staff -->
+  <% if (unpaidByStaff && unpaidByStaff.length > 0) { %>
+    <section style="margin-bottom:24px">
+      <h2 style="margin-bottom:12px;font-size:18px;font-weight:600"><i class="fa fa-user-chart"></i>Outstanding by Staff Member</h2>
+      <div style="background:white;border-radius:8px;border:1px solid #e6edf3;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Staff Name</th>
+              <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Unpaid Orders</th>
+              <th style="padding:12px 16px;text-align:right;font-weight:600;color:#dc3545;font-size:13px">Total Outstanding</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Last Outstanding Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% unpaidByStaff.forEach(staff => { %>
+              <tr style="border-bottom:1px solid #e6edf3;background:#fef0e8">
+                <td style="padding:12px 16px;font-size:13px;font-weight:500"><%= staff.staff_name %></td>
+                <td style="padding:12px 16px;text-align:center;font-size:13px">
+                  <span style="background:#ffe8e8;color:#dc3545;padding:4px 12px;border-radius:20px;font-weight:600"><%= staff.unpaid_count %></span>
+                </td>
+                <td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:700;color:#dc3545"><%= parseFloat(staff.unpaid_total).toFixed(2) %> UGX</td>
+                <td style="padding:12px 16px;font-size:13px;color:#6b7280"><%= new Date(staff.last_unpaid_date).toLocaleDateString() %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:#fff3cd;border:1px solid #ffeaa7;border-radius:8px;padding:12px 16px;margin-top:16px;font-size:13px">
+        <i class="fa fa-info-circle" style="margin-right:8px;color:#856404"></i>
+        <strong style="color:#856404">Total Outstanding:</strong> <span style="color:#dc3545;font-weight:700"><%= totalUnpaid.toFixed(2) %> UGX</span> from <strong><%= totalTransactions %></strong> transactions
+      </div>
+    </section>
+  <% } %>
+
+  <!-- All Unpaid Transactions -->
+  <section style="margin-bottom:24px">
+    <h2 style="margin-bottom:12px;font-size:18px;font-weight:600"><i class="fa fa-list"></i>All Outstanding Transactions</h2>
+    
+    <% if (unpaidDebts && unpaidDebts.length > 0) { %>
+      <div style="background:white;border-radius:8px;border:1px solid #e6edf3;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:#fbfdff;border-bottom:2px solid #e6edf3">
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">ID</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Staff</th>
+              <th style="padding:12px 16px;text-align:right;font-weight:600;color:#6b7280;font-size:13px">Amount</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Room</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Order Details</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:#6b7280;font-size:13px">Sale Date</th>
+              <th style="padding:12px 16px;text-align:center;font-weight:600;color:#6b7280;font-size:13px">Days Outstanding</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% unpaidDebts.forEach(debt => { %>
+              <% const daysOut = debt.days_outstanding; %>
+              <% const urgencyColor = daysOut > 7 ? '#dc3545' : (daysOut > 3 ? '#ffc107' : '#6b7280'); %>
+              <tr style="border-bottom:1px solid #e6edf3;background:#fef0e8">
+                <td style="padding:12px 16px;font-size:13px"><strong>#<%= debt.id %></strong></td>
+                <td style="padding:12px 16px;font-size:13px;font-weight:500"><%= debt.staff_name || 'Unknown' %></td>
+                <td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:700;color:#dc3545"><%= parseFloat(debt.amount).toFixed(2) %> UGX</td>
+                <td style="padding:12px 16px;font-size:13px"><%= debt.room_number %></td>
+                <td style="padding:12px 16px;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis"><%= debt.order_details %></td>
+                <td style="padding:12px 16px;font-size:13px;color:#6b7280"><%= new Date(debt.created_at).toLocaleDateString() %></td>
+                <td style="padding:12px 16px;text-align:center;font-size:13px;font-weight:600;color:<%= urgencyColor %>">
+                  <i class="fa fa-calendar"></i> <%= daysOut %> days
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div style="background:white;border-radius:8px;border:1px solid #e6edf3;padding:40px;text-align:center;color:#6b7280">
+        <i class="fa fa-check-circle" style="font-size:40px;margin-bottom:12px;display:block;color:#28a745"></i>
+        <p style="font-size:16px;font-weight:600">All payments are cleared!</p>
+        <p style="font-size:14px;color:#9ca3af">No outstanding debts to track.</p>
+      </div>
+    <% } %>
+  </section>
+
+  <div style="margin-top:20px;text-align:center">
+    <a href="/clearance" class="button secondary">Back to Clearance</a>
+  </div>
+</div>
+
+<style>
+.unpaid-debts-page {
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  table th,
+  table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  table {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    font-size: 11px;
+  }
+
+  table th,
+  table td {
+    padding: 8px 6px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+}
+</style>

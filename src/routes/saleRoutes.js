@@ -11,5 +11,11 @@ router.post('/sales', authMiddleware, saleController.addOrder);
 router.post('/sales/:id/status', authMiddleware, requireRole(['admin']), saleController.updateSaleStatus);
 // Debtors view limited to admin
 router.get('/sales/debtors', authMiddleware, requireRole(['admin']), saleController.showDebtorsPage);
+// Added a route to fetch sales made on the current day
+router.get('/sales/today', authMiddleware, saleController.showTodaySales);
+// Print sales orders
+router.get('/sales/print', authMiddleware, saleController.printSales);
+// Print single order
+router.get('/sales/:id/print', authMiddleware, saleController.printSingleOrder);
 
 module.exports = router;

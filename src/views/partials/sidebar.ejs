@@ -7,6 +7,9 @@
 
       <% const role = (user.role || '').toString().toLowerCase(); %>
       <% if (role === 'admin') { %>
+        <li><a href="/summary"><i class="fa fa-chart-pie icon"></i>Summary</a></li>
+        <li><a href="/clearance"><i class="fa fa-handshake icon"></i>Staff Clearance</a></li>
+        <li><a href="/production"><i class="fa fa-industry icon"></i>Production</a></li>
         <li><a href="/expenses"><i class="fa fa-file-invoice-dollar icon"></i>Expenses</a></li>
         <li><a href="/settings"><i class="fa fa-cog icon"></i>Settings</a></li>
       <% } else if (role === 'staff') { %>

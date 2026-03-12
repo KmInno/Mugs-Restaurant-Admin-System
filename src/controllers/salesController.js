@@ -4,16 +4,93 @@ const logger = require('../utils/logger');
 async function showSalesPage(req, res) {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    const [todayTotal, allSales, totalDebtors] = await Promise.all([
-      salesModel.getTotalSalesForDate(today),
-      salesModel.getAllSales(),
-      salesModel.getTotalDebtorsForDate(today)
-    ]);
-    logger.info(`showSalesPage todayTotal=${todayTotal} allSalesCount=${allSales.length}`);
-    res.render('sales', { title: 'Sales', sales: allSales, totalSales: todayTotal, totalDebtors });
+    const { period = 'daily' } = req.query;
+    
+    let salesData = [];
+    let periodLabel = 'Daily Sales';
+    let timeOfDayStats = {};
+    
+    if (period === 'weekly') {
+      salesData = await salesModel.getWeeklySales();
+      periodLabel = 'Weekly Sales';
+      
+      // Get weekly stats by time of day
+      const today_obj = new Date();
+      const dayOfWeek = today_obj.getDay();
+      const monday = new Date(today_obj);
+      monday.setDate(today_obj.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      
+      const startDate = monday.toISOString().slice(0, 10);
+      const endDate = sunday.toISOString().slice(0, 10);
+      timeOfDayStats = await salesModel.getSalesStatsByTimeOfDay(startDate, endDate);
+    } else if (period === 'monthly') {
+      salesData = await salesModel.getMonthlySales();
+      periodLabel = 'Monthly Sales';
+      
+      // Get monthly stats by time of day
+      const today_obj = new Date();
+      const startDate = new Date(today_obj.getFullYear(), today_obj.getMonth(), 1).toISOString().slice(0, 10);
+      const endDate = new Date(today_obj.getFullYear(), today_obj.getMonth() + 1, 0).toISOString().slice(0, 10);
+      timeOfDayStats = await salesModel.getSalesStatsByTimeOfDay(startDate, endDate);
+    } else {
+      // Daily
+      const timeOfDayData = await salesModel.getSalesByTimeOfDay(today);
+      salesData = timeOfDayData.breakfast.concat(timeOfDayData.lunch);
+      timeOfDayStats = {
+        breakfast: {
+          total: timeOfDayData.breakfast.reduce((sum, s) => sum + parseFloat(s.amount || 0), 0),
+          count: timeOfDayData.breakfast.length
+        },
+        lunch: {
+          total: timeOfDayData.lunch.reduce((sum, s) => sum + parseFloat(s.amount || 0), 0),
+          count: timeOfDayData.lunch.length
+        }
+      };
+    }
+    
+    // Get breakfast and lunch for display
+    const breakfastOrders = salesData.filter(s => new Date(s.created_at).getHours() < 12);
+    const lunchOrders = salesData.filter(s => new Date(s.created_at).getHours() >= 12);
+    
+    const totalSales = salesData.reduce((sum, s) => sum + parseFloat(s.amount || 0), 0);
+    const totalDebtors = await salesModel.getTotalDebtorsForDate(today);
+    
+    logger.info(`showSalesPage period=${period} ${periodLabel} -> total sales=${totalSales} breakfast=${breakfastOrders.length} lunch=${lunchOrders.length}`);
+    
+    res.render('sales', {
+      title: 'Sales',
+      period,
+      periodLabel,
+      allSales: salesData,
+      breakfastOrders,
+      lunchOrders,
+      totalSales,
+      totalDebtors,
+      timeOfDayStats,
+      breakfastTotal: timeOfDayStats.breakfast?.total || 0,
+      breakfastCount: timeOfDayStats.breakfast?.count || 0,
+      lunchTotal: timeOfDayStats.lunch?.total || 0,
+      lunchCount: timeOfDayStats.lunch?.count || 0
+    });
   } catch (err) {
     logger.error('Error showing sales page: ' + (err && err.message ? err.message : err));
-    res.render('sales', { title: 'Sales', sales: [], totalSales: 0, totalDebtors: 0 });
+    res.render('sales', {
+      title: 'Sales',
+      period: 'daily',
+      periodLabel: 'Daily Sales',
+      allSales: [],
+      breakfastOrders: [],
+      lunchOrders: [],
+      totalSales: 0,
+      totalDebtors: 0,
+      timeOfDayStats: { breakfast: { total: 0, count: 0 }, lunch: { total: 0, count: 0 } },
+      breakfastTotal: 0,
+      breakfastCount: 0,
+      lunchTotal: 0,
+      lunchCount: 0
+    });
   }
 }
 
@@ -114,7 +191,17 @@ async function updateSaleStatus(req, res) {
   }
 }
 
-module.exports = { showSalesPage, showAddSalePage, addOrder, updateSaleStatus };
+// Added a method to fetch sales made on the current day
+async function showTodaySales(req, res) {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const todaySales = await salesModel.getSalesByDate(today);
+    res.render('sales', { title: "Today's Sales", sales: todaySales, totalSales: todaySales.reduce((sum, sale) => sum + sale.amount, 0) });
+  } catch (err) {
+    logger.error('Error fetching today\'s sales: ' + (err && err.message ? err.message : err));
+    res.render('sales', { title: "Today's Sales", sales: [], totalSales: 0 });
+  }
+}
 
 async function showDebtorsPage(req, res) {
   try {
@@ -127,6 +214,67 @@ async function showDebtorsPage(req, res) {
   }
 }
 
-module.exports = { showSalesPage, showAddSalePage, addOrder, updateSaleStatus, showDebtorsPage };
+async function printSales(req, res) {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const { period = 'daily' } = req.query;
+    
+    let allSales = [];
+    let totalSales = 0;
+    
+    if (period === 'weekly') {
+      allSales = await salesModel.getWeeklySales();
+    } else if (period === 'monthly') {
+      allSales = await salesModel.getMonthlySales();
+    } else {
+      // Daily - get all sales with time period
+      const timeOfDayData = await salesModel.getSalesByTimeOfDay(today);
+      allSales = timeOfDayData.breakfast.concat(timeOfDayData.lunch);
+    }
+    
+    totalSales = allSales.reduce((sum, s) => sum + parseFloat(s.amount || 0), 0);
+    
+    logger.info(`printSales period=${period} -> ${allSales.length} sales`);
+    
+    res.render('sales_print', {
+      title: 'Sales Print',
+      allSales,
+      totalSales,
+      period
+    });
+  } catch (err) {
+    logger.error('Error printing sales: ' + (err && err.message ? err.message : err));
+    res.status(500).send('Failed to load print page');
+  }
+}
+
+async function printSingleOrder(req, res) {
+  try {
+    const { id } = req.params;
+    
+    const sale = await salesModel.getSaleById(id);
+    
+    if (!sale) {
+      logger.warn(`printSingleOrder: sale not found for id=${id}`);
+      return res.status(404).send('Order not found');
+    }
+    
+    // Get full sale details with staff info
+    const salesForDate = await salesModel.getSalesForDate(new Date().toISOString().slice(0, 10));
+    const saleWithStaff = salesForDate.find(s => s.id === parseInt(id)) || sale;
+    
+    logger.info(`printSingleOrder id=${id}`);
+    
+    res.render('sales_print_single', {
+      title: 'Order Receipt',
+      sale: saleWithStaff
+    });
+  } catch (err) {
+    logger.error('Error printing order: ' + (err && err.message ? err.message : err));
+    res.status(500).send('Failed to load print page');
+  }
+}
+
+module.exports = { showSalesPage, showAddSalePage, addOrder, updateSaleStatus, showDebtorsPage, showTodaySales, printSales, printSingleOrder };
 
 
